@@ -30,7 +30,7 @@ class AppLayout extends StatelessWidget {
           child: Opacity(
             opacity: 0.05,
             child: Image.asset(
-              "assets/images/cadeado.jpeg",
+              "assets/images/cadeado.png",
               width: 280,
             ),
           ),

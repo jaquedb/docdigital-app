@@ -107,7 +107,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             Opacity(
               opacity: 0.08,
               child: Image.asset(
-                "assets/images/cadeado.jpeg",
+                "assets/images/cadeado.png",
                 width: 300,
               ),
             ),
