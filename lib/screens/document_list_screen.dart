@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../widgets/app_background.dart';
 import '../services/document_service.dart';
 import '../models/documento.dart';
+import 'add_document_screen.dart';
 
 class DocumentListScreen extends StatefulWidget {
   const DocumentListScreen({super.key});
@@ -14,7 +15,7 @@ class DocumentListScreen extends StatefulWidget {
 class _DocumentListScreenState extends State<DocumentListScreen> {
 
   // TOKEN FIXO TEMPORÁRIO
-  final String token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqYXF1ZUBlbWFpbC5jb20iLCJpYXQiOjE3NzI5NDMxMDcsImV4cCI6MTc3Mjk0NjcwN30.XNV7tQ8eIfO_v7MgTH6yW9Mo_EXdjkvbmeEuEmTyppg";
+  final String token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqYXF1ZUBlbWFpbC5jb20iLCJpYXQiOjE3NzI5NDg2NDQsImV4cCI6MTc3Mjk1MjI0NH0.gVehyyMulAvbt8fqumSgaYmDvOkgQxprNEJFu5SOWy4";
 
   late Future<List<Documento>> documentosFuture;
 
@@ -28,7 +29,7 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
   Future<void> abrirDocumento(String caminhoArquivo) async {
 
     final url = Uri.parse(
-        "http://127.0.0.1:8080/documentos/visualizar/$caminhoArquivo"
+      "http://127.0.0.1:8080/documentos/visualizar/$caminhoArquivo",
     );
 
     if (await canLaunchUrl(url)) {
@@ -39,14 +40,12 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
     } else {
       throw Exception("Não foi possível abrir o documento");
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
-
       backgroundColor: Colors.transparent,
 
       appBar: AppBar(
@@ -59,9 +58,7 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
       ),
 
       body: AppBackground(
-
         child: FutureBuilder<List<Documento>>(
-
           future: documentosFuture,
 
           builder: (context, snapshot) {
@@ -81,9 +78,7 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
               );
             }
 
-            final documentos = snapshot.data!;
-
-            if (documentos.isEmpty) {
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return const Center(
                 child: Text(
                   "Nenhum documento cadastrado",
@@ -92,10 +87,10 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
               );
             }
 
+            final documentos = snapshot.data!;
+
             return ListView.builder(
-
               padding: const EdgeInsets.all(16),
-
               itemCount: documentos.length,
 
               itemBuilder: (context, index) {
@@ -103,13 +98,10 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
                 final doc = documentos[index];
 
                 return Card(
-
                   color: const Color(0xFF1F2937),
-
                   margin: const EdgeInsets.only(bottom: 12),
 
                   child: ListTile(
-
                     leading: const Icon(
                       Icons.description,
                       color: Colors.white,
@@ -128,26 +120,26 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
                     onTap: () {
                       abrirDocumento(doc.caminhoArquivo);
                     },
-
                   ),
-
                 );
-
               },
-
             );
-
           },
-
         ),
-
       ),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const AddDocumentScreen(),
+            ),
+          );
+
+        },
         child: const Icon(Icons.add),
       ),
-
     );
   }
 }

@@ -15,7 +15,6 @@ class AppBackground extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return Container(
-
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -29,19 +28,25 @@ class AppBackground extends StatelessWidget {
       ),
 
       child: Stack(
-        alignment: Alignment.center,
         children: [
 
           if (showWatermark)
-            Opacity(
-              opacity: 0.08,
-              child: Image.asset(
-                "assets/images/cadeado.png",
-                width: 300,
+            Center(
+              child: Opacity(
+                opacity: 0.08,
+                child: Image.asset(
+                  "assets/images/cadeado.png",
+                  width: 300,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
 
-          child,
+          Positioned.fill(
+            child: SafeArea(
+              child: child,
+            ),
+          ),
 
         ],
       ),
