@@ -1,12 +1,21 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:file_picker/file_picker.dart';
 import '../models/documento.dart';
+import 'token_storage.dart';
 
 class DocumentService {
 
   static const String baseUrl = "http://127.0.0.1:8080";
 
-  static Future<List<Documento>> listarDocumentos(String token) async {
+  // LISTAR DOCUMENTOS
+  static Future<List<Documento>> listarDocumentos() async {
+
+    final token = await TokenStorage.obterToken();
+
+    if (token == null) {
+      throw Exception("Usuário não autenticado");
+    }
 
     final response = await http.get(
       Uri.parse("$baseUrl/documentos"),
@@ -27,7 +36,74 @@ class DocumentService {
       throw Exception("Erro ao carregar documentos");
 
     }
+  }
 
+  // UPLOAD DOCUMENTO
+  static Future<void> uploadDocumento({
+    required PlatformFile arquivo,
+    required String nome,
+    required String descricao,
+    required String categoria,
+    String? dataVencimento,
+  }) async {
+
+    final token = await TokenStorage.obterToken();
+
+    if (token == null) {
+      throw Exception("Usuário não autenticado");
+    }
+
+    var request = http.MultipartRequest(
+      "POST",
+      Uri.parse("$baseUrl/documentos"),
+    )..headers.addAll({
+      "Authorization": "Bearer $token"
+    });
+
+    // SUPORTE PARA WEB E MOBILE
+    if (arquivo.bytes != null) {
+
+      // Flutter Web
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          "file",
+          arquivo.bytes!,
+          filename: arquivo.name,
+        ),
+      );
+
+    } else if (arquivo.path != null) {
+
+      // Android / iOS
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          "file",
+          arquivo.path!,
+          filename: arquivo.name,
+        ),
+      );
+
+    } else {
+
+      throw Exception("Arquivo inválido");
+
+    }
+
+    request.fields["nome"] = nome;
+    request.fields["descricao"] = descricao;
+    request.fields["categoria"] = categoria;
+
+    if (dataVencimento != null) {
+      request.fields["dataVencimento"] = dataVencimento;
+    }
+
+    final streamedResponse = await request.send();
+
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception("Erro ao enviar documento: ${response.statusCode}");
+    }
   }
 
 }

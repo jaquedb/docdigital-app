@@ -14,15 +14,16 @@ class DocumentListScreen extends StatefulWidget {
 
 class _DocumentListScreenState extends State<DocumentListScreen> {
 
-  // TOKEN FIXO TEMPORÁRIO
-  final String token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqYXF1ZUBlbWFpbC5jb20iLCJpYXQiOjE3NzI5NDg2NDQsImV4cCI6MTc3Mjk1MjI0NH0.gVehyyMulAvbt8fqumSgaYmDvOkgQxprNEJFu5SOWy4";
-
   late Future<List<Documento>> documentosFuture;
 
   @override
   void initState() {
     super.initState();
-    documentosFuture = DocumentService.listarDocumentos(token);
+    carregarDocumentos();
+  }
+
+  void carregarDocumentos() {
+    documentosFuture = DocumentService.listarDocumentos();
   }
 
   // FUNÇÃO PARA ABRIR O DOCUMENTO
@@ -40,6 +41,20 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
     } else {
       throw Exception("Não foi possível abrir o documento");
     }
+  }
+
+  Future<void> abrirTelaAdicionar() async {
+
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const AddDocumentScreen(),
+      ),
+    );
+
+    // Atualiza a lista ao voltar
+    setState(() {
+      carregarDocumentos();
+    });
   }
 
   @override
@@ -129,15 +144,7 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
       ),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const AddDocumentScreen(),
-            ),
-          );
-
-        },
+        onPressed: abrirTelaAdicionar,
         child: const Icon(Icons.add),
       ),
     );

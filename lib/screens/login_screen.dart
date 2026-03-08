@@ -1,7 +1,46 @@
 import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController senhaController = TextEditingController();
+
+  Future<void> fazerLogin() async {
+
+    final email = emailController.text;
+    final senha = senhaController.text;
+
+    if (email.isEmpty || senha.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Informe email e senha")),
+      );
+      return;
+    }
+
+    try {
+
+      await AuthService.login(email, senha);
+
+      if (!mounted) return;
+
+      Navigator.pushReplacementNamed(context, '/documentos');
+
+    } catch (e) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Erro ao fazer login")),
+      );
+
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +91,7 @@ class LoginScreen extends StatelessWidget {
                     const SizedBox(height: 40),
 
                     TextField(
+                      controller: emailController,
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         labelText: "Email",
@@ -68,6 +108,7 @@ class LoginScreen extends StatelessWidget {
                     const SizedBox(height: 20),
 
                     TextField(
+                      controller: senhaController,
                       obscureText: true,
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
@@ -102,9 +143,7 @@ class LoginScreen extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(context, '/documentos');
-                        },
+                        onPressed: fazerLogin,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),

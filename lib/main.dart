@@ -21,7 +21,7 @@ class DocDigitalApp extends StatelessWidget {
         brightness: Brightness.dark,
       ),
 
-      initialRoute: '/documentos',
+      initialRoute: '/login',
 
       routes: {
         '/login': (context) => const LoginScreen(),
