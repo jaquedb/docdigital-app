@@ -1,45 +1,61 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
 
+  final TextEditingController nomeController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController senhaController = TextEditingController();
+  final TextEditingController confirmarSenhaController = TextEditingController();
 
-  Future<void> fazerLogin() async {
+  Future<void> criarConta() async {
 
+    final nome = nomeController.text;
     final email = emailController.text;
     final senha = senhaController.text;
+    final confirmarSenha = confirmarSenhaController.text;
 
-    if (email.isEmpty || senha.isEmpty) {
+    if (nome.isEmpty || email.isEmpty || senha.isEmpty || confirmarSenha.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Informe email e senha")),
+        const SnackBar(content: Text("Preencha todos os campos")),
+      );
+      return;
+    }
+
+    if (senha != confirmarSenha) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("As senhas não coincidem")),
       );
       return;
     }
 
     try {
 
-      await AuthService.login(email, senha);
+      await AuthService.register(nome, email, senha);
 
       if (!mounted) return;
 
-      Navigator.pushReplacementNamed(context, '/documentos');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Conta criada com sucesso")),
+      );
+
+      Navigator.pop(context);
 
     } catch (e) {
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Erro ao fazer login")),
+        const SnackBar(content: Text("Erro ao criar conta")),
       );
 
     }
+
   }
 
   @override
@@ -79,16 +95,32 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 30),
 
                     const Text(
-                      "Bem-vindo ao DocDigital",
+                      "Criar conta",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 22,
                         fontWeight: FontWeight.w500,
                       ),
-                      textAlign: TextAlign.center,
                     ),
 
                     const SizedBox(height: 40),
+
+                    TextField(
+                      controller: nomeController,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        labelText: "Nome",
+                        labelStyle: TextStyle(color: Colors.white70),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white30),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
 
                     TextField(
                       controller: emailController,
@@ -123,31 +155,34 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
 
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 20),
 
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, '/forgot-password');
-                        },
-                        child: const Text(
-                          "Esqueceu a senha?",
-                          style: TextStyle(color: Colors.white70),
+                    TextField(
+                      controller: confirmarSenhaController,
+                      obscureText: true,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        labelText: "Confirmar senha",
+                        labelStyle: TextStyle(color: Colors.white70),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white30),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
                         ),
                       ),
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 30),
 
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: fazerLogin,
+                        onPressed: criarConta,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        child: const Text("ENTRAR"),
+                        child: const Text("CRIAR CONTA"),
                       ),
                     ),
 
@@ -155,10 +190,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     TextButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, '/register');
+                        Navigator.pop(context);
                       },
                       child: const Text(
-                        "Criar conta",
+                        "Voltar para login",
                         style: TextStyle(color: Colors.white70),
                       ),
                     ),

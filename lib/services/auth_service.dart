@@ -46,6 +46,27 @@ class AuthService {
     }
   }
 
+  // REGISTRO DE USUÁRIO
+  static Future<void> register(String nome, String email, String senha) async {
+
+    final response = await http.post(
+      Uri.parse("$baseUrl/usuarios"),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: jsonEncode({
+        "nome": nome,
+        "email": email,
+        "senha": senha
+      }),
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception("Erro ao criar usuário: ${response.body}");
+    }
+
+  }
+
   // RECUPERAR SENHA
   static Future<Map<String, dynamic>> forgotPassword(String email) async {
 
