@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../widgets/app_background.dart';
 import '../services/document_service.dart';
+import '../services/token_storage.dart';
 import '../models/documento.dart';
 import 'add_document_screen.dart';
 
@@ -22,8 +23,27 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
     carregarDocumentos();
   }
 
-  void carregarDocumentos() {
-    documentosFuture = DocumentService.listarDocumentos();
+  Future<void> carregarDocumentos() async {
+
+    final token = await TokenStorage.obterToken();
+
+    if (token == null) {
+      return;
+    }
+
+    setState(() {
+      documentosFuture = DocumentService.listarDocumentos();
+    });
+  }
+
+  Future<void> logout() async {
+
+    await TokenStorage.removerToken();
+
+    if (!mounted) return;
+
+    Navigator.pushReplacementNamed(context, '/login');
+
   }
 
   // FUNÇÃO PARA ABRIR O DOCUMENTO
@@ -52,9 +72,7 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
     );
 
     // Atualiza a lista ao voltar
-    setState(() {
-      carregarDocumentos();
-    });
+    await carregarDocumentos();
   }
 
   @override
@@ -70,6 +88,13 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
         ),
         backgroundColor: const Color(0xFF0B0F1A),
         elevation: 0,
+
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: logout,
+          )
+        ],
       ),
 
       body: AppBackground(

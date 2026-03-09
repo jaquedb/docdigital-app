@@ -38,15 +38,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     try {
 
+      // cria usuário
       await AuthService.register(nome, email, senha);
+
+      // login automático
+      await AuthService.login(email, senha);
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Conta criada com sucesso")),
-      );
-
-      Navigator.pop(context);
+      Navigator.pushReplacementNamed(context, '/documentos');
 
     } catch (e) {
 
