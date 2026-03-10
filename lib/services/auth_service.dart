@@ -40,7 +40,27 @@ class AuthService {
 
     } else {
 
-      throw Exception("Erro ao fazer login: ${response.body}");
+      try {
+
+        final data = jsonDecode(response.body);
+
+        String mensagem = data["message"] ?? "Erro ao fazer login";
+
+        if (mensagem.contains("Usuário não encontrado")) {
+          throw Exception("Usuário não encontrado");
+        }
+
+        if (mensagem.contains("Senha")) {
+          throw Exception("Senha incorreta");
+        }
+
+        throw Exception(mensagem);
+
+      } catch (e) {
+
+        throw Exception("Não foi possível realizar o login");
+
+      }
 
     }
   }
