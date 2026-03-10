@@ -104,6 +104,18 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           alignment: Alignment.center,
           children: [
 
+            /// BOTÃO DE VOLTAR
+            Positioned(
+              top: 40,
+              left: 10,
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
+              ),
+            ),
+
             Opacity(
               opacity: 0.08,
               child: Image.asset(
