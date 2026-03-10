@@ -31,14 +31,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
 
-      // 🔹 Agora redireciona para o DASHBOARD
+      // 🔹 Redireciona para o DASHBOARD
       Navigator.pushReplacementNamed(context, '/dashboard');
 
     } catch (e) {
 
+      String mensagem = e.toString();
+
+      // remove "Exception:" se existir
+      if (mensagem.startsWith("Exception: ")) {
+        mensagem = mensagem.replaceFirst("Exception: ", "");
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Erro ao fazer login: $e"),
+          content: Text(mensagem),
         ),
       );
 
