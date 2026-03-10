@@ -103,29 +103,28 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
     return vencimentoSemHora.difference(hojeSemHora).inDays;
   }
 
+  int prioridadeDocumento(Documento doc) {
+
+    final dias = diasParaVencer(doc);
+
+    if (dias == null) return 5;
+    if (dias < 0) return 0;
+    if (dias == 0) return 1;
+    if (dias <= 5) return 2;
+    if (dias <= 10) return 3;
+
+    return 4;
+  }
+
   Color corDoCard(Documento doc) {
 
     final dias = diasParaVencer(doc);
 
-    if (dias == null) {
-      return const Color(0xFF1F2937);
-    }
-
-    if (dias < 0) {
-      return const Color(0xFF5A1A1A); // vencido
-    }
-
-    if (dias == 0) {
-      return const Color(0xFF7A3E00); // vence hoje
-    }
-
-    if (dias <= 5) {
-      return const Color(0xFF665200); // até 5 dias
-    }
-
-    if (dias <= 10) {
-      return const Color(0xFF1A3A5A); // até 10 dias
-    }
+    if (dias == null) return const Color(0xFF1F2937);
+    if (dias < 0) return const Color(0xFF5A1A1A);
+    if (dias == 0) return const Color(0xFF7A3E00);
+    if (dias <= 5) return const Color(0xFF665200);
+    if (dias <= 10) return const Color(0xFF1A3A5A);
 
     return const Color(0xFF1F2937);
   }
@@ -171,6 +170,106 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
       style: const TextStyle(
         color: Colors.orangeAccent,
       ),
+    );
+  }
+
+  List<Documento> ordenarDocumentos(List<Documento> docs) {
+
+    docs.sort((a, b) {
+
+      final prioridadeA = prioridadeDocumento(a);
+      final prioridadeB = prioridadeDocumento(b);
+
+      if (prioridadeA != prioridadeB) {
+        return prioridadeA.compareTo(prioridadeB);
+      }
+
+      final diasA = diasParaVencer(a);
+      final diasB = diasParaVencer(b);
+
+      if (diasA == null && diasB == null) return 0;
+      if (diasA == null) return 1;
+      if (diasB == null) return -1;
+
+      return diasA.compareTo(diasB);
+
+    });
+
+    return docs;
+  }
+
+  int contarAlertas(List<Documento> docs) {
+
+    int total = 0;
+
+    for (var doc in docs) {
+
+      final dias = diasParaVencer(doc);
+
+      if (dias != null && dias <= 10) {
+        total++;
+      }
+
+    }
+
+    return total;
+  }
+
+  void mostrarAlertas(List<Documento> docs) {
+
+    final alertas = docs.where((doc) {
+
+      final dias = diasParaVencer(doc);
+      return dias != null && dias <= 10;
+
+    }).toList();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+
+        return AlertDialog(
+
+          title: const Text("Alertas de documentos"),
+
+          content: SizedBox(
+            width: 300,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: alertas.length,
+              itemBuilder: (context, index) {
+
+                final doc = alertas[index];
+                final dias = diasParaVencer(doc);
+
+                String texto;
+
+                if (dias! < 0) {
+                  texto = "VENCIDO";
+                } else if (dias == 0) {
+                  texto = "VENCE HOJE";
+                } else {
+                  texto = "Vence em $dias dias";
+                }
+
+                return ListTile(
+                  title: Text(doc.nome),
+                  subtitle: Text(texto),
+                );
+              },
+            ),
+          ),
+
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Fechar"),
+            )
+          ],
+
+        );
+
+      },
     );
   }
 
@@ -238,10 +337,56 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
         backgroundColor: const Color(0xFF0B0F1A),
         elevation: 0,
         actions: [
+
+          FutureBuilder<List<Documento>>(
+            future: documentosFuture,
+            builder: (context, snapshot) {
+
+              if (!snapshot.hasData) {
+                return const SizedBox();
+              }
+
+              final docs = snapshot.data!;
+              final alertas = contarAlertas(docs);
+
+              return Stack(
+                children: [
+
+                  IconButton(
+                    icon: const Icon(Icons.notifications),
+                    onPressed: () => mostrarAlertas(docs),
+                  ),
+
+                  if (alertas > 0)
+                    Positioned(
+                      right: 6,
+                      top: 6,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          "$alertas",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                ],
+              );
+            },
+          ),
+
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: logout,
           )
+
         ],
       ),
 
@@ -276,7 +421,7 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
               );
             }
 
-            final documentos = snapshot.data!;
+            final documentos = ordenarDocumentos(snapshot.data!);
 
             return ListView.builder(
               padding: const EdgeInsets.all(16),
