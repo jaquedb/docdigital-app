@@ -13,7 +13,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController senhaController = TextEditingController();
 
+  bool carregando = false;
+
   Future<void> fazerLogin() async {
+
+    if (carregando) return;
 
     final email = emailController.text.trim();
     final senha = senhaController.text;
@@ -25,20 +29,22 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
+    setState(() {
+      carregando = true;
+    });
+
     try {
 
       await AuthService.login(email, senha);
 
       if (!mounted) return;
 
-      // 🔹 Redireciona para o DASHBOARD
       Navigator.pushReplacementNamed(context, '/dashboard');
 
     } catch (e) {
 
       String mensagem = e.toString();
 
-      // remove "Exception:" se existir
       if (mensagem.startsWith("Exception: ")) {
         mensagem = mensagem.replaceFirst("Exception: ", "");
       }
@@ -48,6 +54,14 @@ class _LoginScreenState extends State<LoginScreen> {
           content: Text(mensagem),
         ),
       );
+
+    } finally {
+
+      if (mounted) {
+        setState(() {
+          carregando = false;
+        });
+      }
 
     }
   }
@@ -153,24 +167,49 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: fazerLogin,
+                        onPressed: carregando ? null : fazerLogin,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        child: const Text("ENTRAR"),
+                        child: carregando
+                            ? const SizedBox(
+                          height: 22,
+                          width: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                            : const Text("ENTRAR"),
                       ),
                     ),
 
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 25),
 
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/register');
-                      },
-                      child: const Text(
-                        "Criar conta",
-                        style: TextStyle(color: Colors.white70),
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+
+                        const Text(
+                          "Não tem uma conta? ",
+                          style: TextStyle(color: Colors.white70),
+                        ),
+
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/register');
+                          },
+                          child: const Text(
+                            "Cadastre-se",
+                            style: TextStyle(
+                              color: Colors.white,
+                              decoration: TextDecoration.underline,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+
+                      ],
                     ),
 
                   ],
