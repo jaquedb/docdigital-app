@@ -43,39 +43,6 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
     Navigator.pushReplacementNamed(context, '/login');
   }
 
-  IconData obterIconeCategoria(String categoria) {
-
-    switch (categoria) {
-
-      case "DOCUMENTO_PESSOAL":
-        return Icons.person;
-
-      case "DOCUMENTO_VEICULAR":
-        return Icons.directions_car;
-
-      case "DOCUMENTO_ACADEMICO":
-        return Icons.school;
-
-      case "COMPROVANTE_PAGAMENTO":
-        return Icons.payments;
-
-      case "NOTA_FISCAL":
-        return Icons.receipt;
-
-      case "CONTRATO":
-        return Icons.description;
-
-      case "EXAME_MEDICO":
-        return Icons.local_hospital;
-
-      case "RECEITUARIO_MEDICO":
-        return Icons.medical_services;
-
-      default:
-        return Icons.folder;
-    }
-  }
-
   String obterNomeCategoria(String categoria) {
 
     switch (categoria) {
@@ -122,6 +89,91 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
     return tipoArquivo.contains("image");
   }
 
+  int? diasParaVencer(Documento doc) {
+
+    if (doc.dataVencimento == null) return null;
+
+    final hoje = DateTime.now();
+    final vencimento = DateTime.parse(doc.dataVencimento!);
+
+    final hojeSemHora = DateTime(hoje.year, hoje.month, hoje.day);
+    final vencimentoSemHora =
+    DateTime(vencimento.year, vencimento.month, vencimento.day);
+
+    return vencimentoSemHora.difference(hojeSemHora).inDays;
+  }
+
+  Color corDoCard(Documento doc) {
+
+    final dias = diasParaVencer(doc);
+
+    if (dias == null) {
+      return const Color(0xFF1F2937);
+    }
+
+    if (dias < 0) {
+      return const Color(0xFF5A1A1A); // vencido
+    }
+
+    if (dias == 0) {
+      return const Color(0xFF7A3E00); // vence hoje
+    }
+
+    if (dias <= 5) {
+      return const Color(0xFF665200); // até 5 dias
+    }
+
+    if (dias <= 10) {
+      return const Color(0xFF1A3A5A); // até 10 dias
+    }
+
+    return const Color(0xFF1F2937);
+  }
+
+  Widget alertaVencimento(Documento doc) {
+
+    final dias = diasParaVencer(doc);
+
+    if (dias == null) return const SizedBox();
+
+    if (dias < 0) {
+      return const Text(
+        "⚠ DOCUMENTO VENCIDO",
+        style: TextStyle(
+          color: Colors.redAccent,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    }
+
+    if (dias == 0) {
+      return const Text(
+        "⚠ VENCE HOJE",
+        style: TextStyle(
+          color: Colors.orangeAccent,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    }
+
+    if (dias <= 10) {
+      return Text(
+        "⚠ Vence em $dias dias",
+        style: const TextStyle(
+          color: Colors.yellowAccent,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    }
+
+    return Text(
+      "⏳ Vence em ${formatarData(doc.dataVencimento!)}",
+      style: const TextStyle(
+        color: Colors.orangeAccent,
+      ),
+    );
+  }
+
   Future<void> abrirTelaAdicionar() async {
 
     await Navigator.of(context).push(
@@ -142,7 +194,6 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
       ),
     );
 
-    // 🔹 Atualiza a lista quando voltar da tela de detalhes
     await carregarDocumentos();
   }
 
@@ -236,7 +287,7 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
                 final doc = documentos[index];
 
                 return Card(
-                  color: const Color(0xFF1F2937),
+                  color: corDoCard(doc),
                   margin: const EdgeInsets.only(bottom: 12),
 
                   child: ListTile(
@@ -265,12 +316,8 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
                         ),
 
                         if (doc.dataVencimento != null)
-                          Text(
-                            "⏳ Vence em ${formatarData(doc.dataVencimento!)}",
-                            style: const TextStyle(
-                              color: Colors.orangeAccent,
-                            ),
-                          ),
+                          alertaVencimento(doc),
+
                       ],
                     ),
 
