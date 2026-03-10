@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import '../widgets/app_background.dart';
 import '../services/document_service.dart';
 import '../models/documento.dart';
@@ -26,6 +28,8 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
 
   String categoriaSelecionada = "Documento pessoal";
   DateTime? dataVencimento;
+
+  final ImagePicker _picker = ImagePicker();
 
   final Map<String, String> categorias = {
     "Documento pessoal": "DOCUMENTO_PESSOAL",
@@ -78,6 +82,26 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
     }
   }
 
+  Future<void> digitalizarDocumento() async {
+
+    final XFile? foto = await _picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 85,
+    );
+
+    if (foto == null) return;
+
+    final bytes = await File(foto.path).readAsBytes();
+
+    setState(() {
+      arquivoSelecionado = PlatformFile(
+        name: foto.name,
+        size: bytes.length,
+        bytes: bytes,
+      );
+    });
+  }
+
   Future<void> selecionarData() async {
 
     DateTime? data = await showDatePicker(
@@ -98,7 +122,7 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
 
     if (!modoEdicao && arquivoSelecionado == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Selecione um arquivo")),
+        const SnackBar(content: Text("Selecione ou digitalize um arquivo")),
       );
       return;
     }
@@ -199,6 +223,17 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
                   child: ElevatedButton(
                     onPressed: selecionarArquivo,
                     child: const Text("Selecionar Arquivo"),
+                  ),
+                ),
+
+              if (!modoEdicao) const SizedBox(height: 10),
+
+              if (!modoEdicao)
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: digitalizarDocumento,
+                    child: const Text("Digitalizar com Câmera"),
                   ),
                 ),
 
