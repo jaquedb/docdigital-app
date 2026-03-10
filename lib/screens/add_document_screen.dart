@@ -2,9 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import '../widgets/app_background.dart';
 import '../services/document_service.dart';
+import '../models/documento.dart';
 
 class AddDocumentScreen extends StatefulWidget {
-  const AddDocumentScreen({super.key});
+
+  final Documento? documento;
+
+  const AddDocumentScreen({
+    super.key,
+    this.documento,
+  });
 
   @override
   State<AddDocumentScreen> createState() => _AddDocumentScreenState();
@@ -32,6 +39,30 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
     "Outros": "OUTROS",
   };
 
+  bool get modoEdicao => widget.documento != null;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (modoEdicao) {
+
+      final doc = widget.documento!;
+
+      nomeController.text = doc.nome;
+      descricaoController.text = doc.descricao ?? "";
+
+      categoriaSelecionada = categorias.entries
+          .firstWhere((e) => e.value == doc.categoria)
+          .key;
+
+      if (doc.dataVencimento != null) {
+        dataVencimento = DateTime.parse(doc.dataVencimento!);
+      }
+
+    }
+  }
+
   Future<void> selecionarArquivo() async {
 
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -51,7 +82,7 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
 
     DateTime? data = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: dataVencimento ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
@@ -65,7 +96,7 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
 
   Future<void> salvarDocumento() async {
 
-    if (arquivoSelecionado == null) {
+    if (!modoEdicao && arquivoSelecionado == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Selecione um arquivo")),
       );
@@ -90,26 +121,46 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
         "${dataVencimento!.year}-${dataVencimento!.month.toString().padLeft(2, '0')}-${dataVencimento!.day.toString().padLeft(2, '0')}";
       }
 
-      await DocumentService.uploadDocumento(
-        arquivo: arquivoSelecionado!,
-        nome: nomeController.text,
-        descricao: descricaoController.text,
-        categoria: categoriaBackend,
-        dataVencimento: dataFormatada,
-      );
+      if (modoEdicao) {
+
+        await DocumentService.atualizarDocumento(
+          id: widget.documento!.id!,
+          nome: nomeController.text,
+          descricao: descricaoController.text,
+          categoria: categoriaBackend,
+          dataVencimento: dataFormatada,
+        );
+
+      } else {
+
+        await DocumentService.uploadDocumento(
+          arquivo: arquivoSelecionado!,
+          nome: nomeController.text,
+          descricao: descricaoController.text,
+          categoria: categoriaBackend,
+          dataVencimento: dataFormatada,
+        );
+
+      }
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Documento enviado com sucesso")),
+        SnackBar(
+          content: Text(
+            modoEdicao
+                ? "Documento atualizado com sucesso"
+                : "Documento enviado com sucesso",
+          ),
+        ),
       );
 
-      Navigator.pop(context);
+      Navigator.pop(context, true);
 
     } catch (e) {
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Erro ao enviar documento")),
+        const SnackBar(content: Text("Erro ao salvar documento")),
       );
 
     }
@@ -123,9 +174,11 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
         backgroundColor: Colors.transparent,
 
         appBar: AppBar(
-          title: const Text(
-            "Adicionar Documento",
-            style: TextStyle(color: Colors.white),
+          title: Text(
+            modoEdicao
+                ? "Editar Documento"
+                : "Adicionar Documento",
+            style: const TextStyle(color: Colors.white),
           ),
           backgroundColor: const Color(0xFF0B0F1A),
           elevation: 0,
@@ -140,15 +193,16 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
 
               const SizedBox(height: 20),
 
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: selecionarArquivo,
-                  child: const Text("Selecionar Arquivo"),
+              if (!modoEdicao)
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: selecionarArquivo,
+                    child: const Text("Selecionar Arquivo"),
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 10),
+              if (!modoEdicao) const SizedBox(height: 10),
 
               if (arquivoSelecionado != null)
                 Text(
@@ -255,7 +309,9 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: salvarDocumento,
-                  child: const Text("SALVAR"),
+                  child: Text(
+                    modoEdicao ? "ATUALIZAR" : "SALVAR",
+                  ),
                 ),
               ),
 

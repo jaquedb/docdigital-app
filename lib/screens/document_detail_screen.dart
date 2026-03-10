@@ -4,6 +4,7 @@ import '../models/documento.dart';
 import '../widgets/app_background.dart';
 import '../services/token_storage.dart';
 import '../services/document_service.dart';
+import 'add_document_screen.dart';
 
 class DocumentDetailScreen extends StatelessWidget {
 
@@ -49,6 +50,20 @@ class DocumentDetailScreen extends StatelessWidget {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     }
 
+  }
+
+  Future<void> editarDocumento(BuildContext context) async {
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddDocumentScreen(documento: documento),
+      ),
+    );
+
+    if (!context.mounted) return;
+
+    Navigator.pop(context, true);
   }
 
   Future<void> excluirDocumento(BuildContext context) async {
@@ -102,7 +117,7 @@ class DocumentDetailScreen extends StatelessWidget {
       ),
     );
 
-    Navigator.pop(context);
+    Navigator.pop(context, true);
   }
 
   @override
@@ -215,6 +230,17 @@ class DocumentDetailScreen extends StatelessWidget {
                     ),
 
                   ],
+                ),
+
+                const SizedBox(height: 12),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.edit),
+                    label: const Text("EDITAR"),
+                    onPressed: () => editarDocumento(context),
+                  ),
                 ),
 
                 const SizedBox(height: 12),

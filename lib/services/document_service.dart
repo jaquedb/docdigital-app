@@ -60,10 +60,8 @@ class DocumentService {
       "Authorization": "Bearer $token"
     });
 
-    // SUPORTE PARA WEB E MOBILE
     if (arquivo.bytes != null) {
 
-      // Flutter Web
       request.files.add(
         http.MultipartFile.fromBytes(
           "file",
@@ -74,7 +72,6 @@ class DocumentService {
 
     } else if (arquivo.path != null) {
 
-      // Android / iOS
       request.files.add(
         await http.MultipartFile.fromPath(
           "file",
@@ -104,6 +101,41 @@ class DocumentService {
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception("Erro ao enviar documento: ${response.statusCode}");
     }
+  }
+
+  // ATUALIZAR DOCUMENTO
+  static Future<void> atualizarDocumento({
+    required int id,
+    required String nome,
+    required String descricao,
+    required String categoria,
+    String? dataVencimento,
+  }) async {
+
+    final token = await TokenStorage.obterToken();
+
+    if (token == null) {
+      throw Exception("Usuário não autenticado");
+    }
+
+    final response = await http.put(
+      Uri.parse("$baseUrl/documentos/$id"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json"
+      },
+      body: jsonEncode({
+        "nome": nome,
+        "descricao": descricao,
+        "categoria": categoria,
+        "dataVencimento": dataVencimento
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Erro ao atualizar documento");
+    }
+
   }
 
   // DELETAR DOCUMENTO
