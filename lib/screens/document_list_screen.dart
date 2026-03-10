@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../widgets/app_background.dart';
 import '../services/document_service.dart';
 import '../services/token_storage.dart';
 import '../models/documento.dart';
 import 'add_document_screen.dart';
+import 'document_detail_screen.dart';
 
 class DocumentListScreen extends StatefulWidget {
   const DocumentListScreen({super.key});
@@ -119,19 +119,7 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
   }
 
   bool ehImagem(String tipoArquivo) {
-
     return tipoArquivo.contains("image");
-  }
-
-  Future<void> abrirDocumento(String caminhoArquivo) async {
-
-    final url = Uri.parse(
-      "http://127.0.0.1:8080/documentos/visualizar/$caminhoArquivo",
-    );
-
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    }
   }
 
   Future<void> abrirTelaAdicionar() async {
@@ -142,6 +130,19 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
       ),
     );
 
+    await carregarDocumentos();
+  }
+
+  Future<void> abrirDetalhes(Documento doc) async {
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DocumentDetailScreen(documento: doc),
+      ),
+    );
+
+    // 🔹 Atualiza a lista quando voltar da tela de detalhes
     await carregarDocumentos();
   }
 
@@ -201,7 +202,6 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
           builder: (context, snapshot) {
 
             if (snapshot.connectionState == ConnectionState.waiting) {
-
               return const Center(child: CircularProgressIndicator());
             }
 
@@ -274,9 +274,8 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
                       ],
                     ),
 
-                    onTap: () {
-                      abrirDocumento(doc.caminhoArquivo);
-                    },
+                    onTap: () => abrirDetalhes(doc),
+
                   ),
                 );
               },
