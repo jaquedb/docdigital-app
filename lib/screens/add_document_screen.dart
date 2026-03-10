@@ -5,6 +5,7 @@ import 'dart:io';
 import '../widgets/app_background.dart';
 import '../services/document_service.dart';
 import '../models/documento.dart';
+import '../services/notification_service.dart';
 
 class AddDocumentScreen extends StatefulWidget {
 
@@ -63,7 +64,6 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
       if (doc.dataVencimento != null) {
         dataVencimento = DateTime.parse(doc.dataVencimento!);
       }
-
     }
   }
 
@@ -148,7 +148,7 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
       if (modoEdicao) {
 
         await DocumentService.atualizarDocumento(
-          id: widget.documento!.id!,
+          id: widget.documento!.id,
           nome: nomeController.text,
           descricao: descricaoController.text,
           categoria: categoriaBackend,
@@ -164,6 +164,21 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
           categoria: categoriaBackend,
           dataVencimento: dataFormatada,
         );
+      }
+
+      // 🔔 TESTE DE NOTIFICAÇÃO (5 segundos)
+      try {
+
+        await NotificationService.agendarNotificacao(
+          id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
+          titulo: "Teste DocDigital",
+          corpo: "Notificação funcionando!",
+          data: DateTime.now().add(const Duration(seconds: 5)),
+        );
+
+      } catch (e) {
+
+        print("Erro ao agendar notificação: $e");
 
       }
 
@@ -186,7 +201,6 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Erro ao salvar documento")),
       );
-
     }
   }
 
@@ -296,20 +310,17 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
                 isExpanded: true,
                 value: categoriaSelecionada,
                 dropdownColor: const Color(0xFF1F2937),
-
                 decoration: const InputDecoration(
                   filled: true,
                   fillColor: Color(0xFF1F2937),
                   border: OutlineInputBorder(),
                 ),
-
                 items: categorias.keys.map((String categoria) {
                   return DropdownMenuItem<String>(
                     value: categoria,
                     child: Text(categoria),
                   );
                 }).toList(),
-
                 onChanged: (value) {
                   setState(() {
                     categoriaSelecionada = value!;
@@ -356,7 +367,6 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
                     child: const Text("Remover data de vencimento"),
                   ),
                 ),
-
               ],
 
               const SizedBox(height: 40),
