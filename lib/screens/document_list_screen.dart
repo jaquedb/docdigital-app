@@ -27,9 +27,7 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
 
     final token = await TokenStorage.obterToken();
 
-    if (token == null) {
-      return;
-    }
+    if (token == null) return;
 
     setState(() {
       documentosFuture = DocumentService.listarDocumentos();
@@ -43,10 +41,88 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
     if (!mounted) return;
 
     Navigator.pushReplacementNamed(context, '/login');
-
   }
 
-  // FUNÇÃO PARA ABRIR O DOCUMENTO
+  IconData obterIconeCategoria(String categoria) {
+
+    switch (categoria) {
+
+      case "DOCUMENTO_PESSOAL":
+        return Icons.person;
+
+      case "DOCUMENTO_VEICULAR":
+        return Icons.directions_car;
+
+      case "DOCUMENTO_ACADEMICO":
+        return Icons.school;
+
+      case "COMPROVANTE_PAGAMENTO":
+        return Icons.payments;
+
+      case "NOTA_FISCAL":
+        return Icons.receipt;
+
+      case "CONTRATO":
+        return Icons.description;
+
+      case "EXAME_MEDICO":
+        return Icons.local_hospital;
+
+      case "RECEITUARIO_MEDICO":
+        return Icons.medical_services;
+
+      default:
+        return Icons.folder;
+    }
+  }
+
+  String obterNomeCategoria(String categoria) {
+
+    switch (categoria) {
+
+      case "DOCUMENTO_PESSOAL":
+        return "Documento pessoal";
+
+      case "DOCUMENTO_VEICULAR":
+        return "Documento veicular";
+
+      case "DOCUMENTO_ACADEMICO":
+        return "Documento acadêmico";
+
+      case "COMPROVANTE_PAGAMENTO":
+        return "Comprovante de pagamento";
+
+      case "NOTA_FISCAL":
+        return "Nota fiscal";
+
+      case "CONTRATO":
+        return "Contrato";
+
+      case "EXAME_MEDICO":
+        return "Exame médico";
+
+      case "RECEITUARIO_MEDICO":
+        return "Receituário médico";
+
+      default:
+        return "Outros";
+    }
+  }
+
+  String formatarData(String dataIso) {
+
+    final data = DateTime.parse(dataIso);
+
+    return "${data.day.toString().padLeft(2,'0')}/"
+        "${data.month.toString().padLeft(2,'0')}/"
+        "${data.year}";
+  }
+
+  bool ehImagem(String tipoArquivo) {
+
+    return tipoArquivo.contains("image");
+  }
+
   Future<void> abrirDocumento(String caminhoArquivo) async {
 
     final url = Uri.parse(
@@ -54,12 +130,7 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
     );
 
     if (await canLaunchUrl(url)) {
-      await launchUrl(
-        url,
-        mode: LaunchMode.externalApplication,
-      );
-    } else {
-      throw Exception("Não foi possível abrir o documento");
+      await launchUrl(url, mode: LaunchMode.externalApplication);
     }
   }
 
@@ -71,8 +142,34 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
       ),
     );
 
-    // Atualiza a lista ao voltar
     await carregarDocumentos();
+  }
+
+  Widget construirPreview(Documento doc) {
+
+    final url =
+        "http://127.0.0.1:8080/documentos/visualizar/${doc.caminhoArquivo}";
+
+    if (ehImagem(doc.tipoArquivo)) {
+
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.network(
+          url,
+          width: 60,
+          height: 60,
+          fit: BoxFit.cover,
+        ),
+      );
+
+    } else {
+
+      return const Icon(
+        Icons.picture_as_pdf,
+        size: 40,
+        color: Colors.redAccent,
+      );
+    }
   }
 
   @override
@@ -88,7 +185,6 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
         ),
         backgroundColor: const Color(0xFF0B0F1A),
         elevation: 0,
-
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -98,18 +194,19 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
       ),
 
       body: AppBackground(
+
         child: FutureBuilder<List<Documento>>(
           future: documentosFuture,
 
           builder: (context, snapshot) {
 
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+
+              return const Center(child: CircularProgressIndicator());
             }
 
             if (snapshot.hasError) {
+
               return const Center(
                 child: Text(
                   "Erro ao carregar documentos",
@@ -119,6 +216,7 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
             }
 
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
+
               return const Center(
                 child: Text(
                   "Nenhum documento cadastrado",
@@ -142,19 +240,38 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
                   margin: const EdgeInsets.only(bottom: 12),
 
                   child: ListTile(
-                    leading: const Icon(
-                      Icons.description,
-                      color: Colors.white,
-                    ),
+
+                    leading: construirPreview(doc),
 
                     title: Text(
                       doc.nome,
                       style: const TextStyle(color: Colors.white),
                     ),
 
-                    subtitle: Text(
-                      doc.categoria,
-                      style: const TextStyle(color: Colors.white70),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+
+                        Text(
+                          obterNomeCategoria(doc.categoria),
+                          style: const TextStyle(color: Colors.white70),
+                        ),
+
+                        const SizedBox(height: 4),
+
+                        Text(
+                          "📅 Enviado em ${formatarData(doc.dataUpload)}",
+                          style: const TextStyle(color: Colors.white54),
+                        ),
+
+                        if (doc.dataVencimento != null)
+                          Text(
+                            "⏳ Vence em ${formatarData(doc.dataVencimento!)}",
+                            style: const TextStyle(
+                              color: Colors.orangeAccent,
+                            ),
+                          ),
+                      ],
                     ),
 
                     onTap: () {
