@@ -59,6 +59,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
               return const Center(child: CircularProgressIndicator());
             }
 
+            if (snapshot.hasError) {
+
+              final erro = snapshot.error.toString();
+
+              if (erro.contains("TOKEN_INVALIDO")) {
+
+                Future.microtask(() {
+                  Navigator.pushReplacementNamed(context, '/login');
+                });
+
+                return const SizedBox();
+              }
+
+              return const Center(
+                child: Text(
+                  "Erro ao carregar dados",
+                  style: TextStyle(color: Colors.white),
+                ),
+              );
+            }
+
             if (!snapshot.hasData) {
               return const Center(
                 child: Text(
@@ -117,7 +138,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       crossAxisCount: 2,
                       mainAxisSpacing: 16,
                       crossAxisSpacing: 16,
-                      childAspectRatio: 1.5,
+                      childAspectRatio: 1.3,
 
                       children: [
 
@@ -184,13 +205,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         icon: const Icon(Icons.add),
                         label: const Text("ADICIONAR DOCUMENTO"),
 
-                        onPressed: () {
+                        onPressed: () async {
 
-                          Navigator.push(
+                          await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
                               const AddDocumentScreen(),
+                            ),
+                          );
+
+                          if (!mounted) return;
+
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                              const DocumentListScreen(),
                             ),
                           );
 
@@ -228,6 +259,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       padding: const EdgeInsets.all(16),
 
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
 
         children: [
@@ -249,8 +281,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
 
+          const SizedBox(height: 4),
+
           Text(
             titulo,
+            textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.white70,
             ),

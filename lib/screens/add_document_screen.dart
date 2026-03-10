@@ -303,7 +303,6 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
                 ),
               ),
 
-              // BOTÃO REMOVER DATA
               if (dataVencimento != null) ...[
 
                 const SizedBox(height: 10),
@@ -312,7 +311,7 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[700],
+                      backgroundColor: Colors.grey,
                     ),
                     onPressed: () {
                       setState(() {

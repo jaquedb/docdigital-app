@@ -30,6 +30,12 @@ class DocumentService {
 
       return jsonList.map((doc) => Documento.fromJson(doc)).toList();
 
+    } else if (response.statusCode == 401 || response.statusCode == 400) {
+
+      // TOKEN INVÁLIDO / USUÁRIO NÃO EXISTE
+      await TokenStorage.removerToken();
+      throw Exception("TOKEN_INVALIDO");
+
     } else {
 
       throw Exception("Erro ao carregar documentos");
@@ -97,8 +103,19 @@ class DocumentService {
 
     final response = await http.Response.fromStream(streamedResponse);
 
-    if (response.statusCode != 200 && response.statusCode != 201) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
+
+      return;
+
+    } else if (response.statusCode == 401 || response.statusCode == 400) {
+
+      await TokenStorage.removerToken();
+      throw Exception("TOKEN_INVALIDO");
+
+    } else {
+
       throw Exception("Erro ao enviar documento: ${response.statusCode}");
+
     }
   }
 
@@ -131,10 +148,20 @@ class DocumentService {
       }),
     );
 
-    if (response.statusCode != 200) {
-      throw Exception("Erro ao atualizar documento");
-    }
+    if (response.statusCode == 200) {
 
+      return;
+
+    } else if (response.statusCode == 401 || response.statusCode == 400) {
+
+      await TokenStorage.removerToken();
+      throw Exception("TOKEN_INVALIDO");
+
+    } else {
+
+      throw Exception("Erro ao atualizar documento");
+
+    }
   }
 
   // DELETAR DOCUMENTO
@@ -148,10 +175,20 @@ class DocumentService {
       },
     );
 
-    if (response.statusCode != 204) {
-      throw Exception("Erro ao deletar documento");
-    }
+    if (response.statusCode == 204) {
 
+      return;
+
+    } else if (response.statusCode == 401 || response.statusCode == 400) {
+
+      await TokenStorage.removerToken();
+      throw Exception("TOKEN_INVALIDO");
+
+    } else {
+
+      throw Exception("Erro ao deletar documento");
+
+    }
   }
 
 }
