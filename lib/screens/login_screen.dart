@@ -15,7 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> fazerLogin() async {
 
-    final email = emailController.text;
+    final email = emailController.text.trim();
     final senha = senhaController.text;
 
     if (email.isEmpty || senha.isEmpty) {
@@ -31,12 +31,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
 
-      Navigator.pushReplacementNamed(context, '/documentos');
+      // 🔹 Agora redireciona para o DASHBOARD
+      Navigator.pushReplacementNamed(context, '/dashboard');
 
     } catch (e) {
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Erro ao fazer login")),
+        SnackBar(
+          content: Text("Erro ao fazer login: $e"),
+        ),
       );
 
     }

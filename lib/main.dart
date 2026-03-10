@@ -4,6 +4,7 @@ import 'screens/login_screen.dart';
 import 'screens/forgot_password_screen.dart';
 import 'screens/document_list_screen.dart';
 import 'screens/register_screen.dart';
+import 'screens/dashboard_screen.dart';
 import 'services/token_storage.dart';
 
 void main() {
@@ -19,7 +20,6 @@ class DocDigitalApp extends StatelessWidget {
       title: 'DocDigital',
       debugShowCheckedModeBanner: false,
 
-      // 👇 ADICIONADO PARA PORTUGUÊS
       locale: const Locale('pt', 'BR'),
 
       localizationsDelegates: const [
@@ -44,6 +44,7 @@ class DocDigitalApp extends StatelessWidget {
         '/register': (context) => const RegisterScreen(),
         '/forgot-password': (context) => const ForgotPasswordScreen(),
         '/documentos': (context) => const DocumentListScreen(),
+        '/dashboard': (context) => const DashboardScreen(),
       },
     );
   }
@@ -84,7 +85,7 @@ class _AuthCheckState extends State<AuthCheck> {
         }
 
         if (snapshot.data == true) {
-          return const DocumentListScreen();
+          return const DashboardScreen();
         } else {
           return const LoginScreen();
         }
