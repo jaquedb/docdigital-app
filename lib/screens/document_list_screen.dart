@@ -17,6 +17,10 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
 
   late Future<List<Documento>> documentosFuture;
 
+  final TextEditingController buscaController = TextEditingController();
+
+  String textoBusca = "";
+
   @override
   void initState() {
     super.initState();
@@ -85,8 +89,23 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
         "${data.year}";
   }
 
-  bool ehImagem(String tipoArquivo) {
-    return tipoArquivo.contains("image");
+  bool ehImagem(Documento doc) {
+
+    final tipo = doc.tipoArquivo.toLowerCase();
+    final nome = doc.caminhoArquivo.toLowerCase();
+
+    return tipo.contains("image") ||
+        nome.endsWith(".png") ||
+        nome.endsWith(".jpg") ||
+        nome.endsWith(".jpeg");
+  }
+
+  bool ehPdf(Documento doc) {
+
+    final tipo = doc.tipoArquivo.toLowerCase();
+    final nome = doc.caminhoArquivo.toLowerCase();
+
+    return tipo.contains("pdf") || nome.endsWith(".pdf");
   }
 
   int? diasParaVencer(Documento doc) {
@@ -138,38 +157,27 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
     if (dias < 0) {
       return const Text(
         "⚠ DOCUMENTO VENCIDO",
-        style: TextStyle(
-          color: Colors.redAccent,
-          fontWeight: FontWeight.bold,
-        ),
+        style: TextStyle(color: Colors.redAccent,fontWeight: FontWeight.bold),
       );
     }
 
     if (dias == 0) {
       return const Text(
         "⚠ VENCE HOJE",
-        style: TextStyle(
-          color: Colors.orangeAccent,
-          fontWeight: FontWeight.bold,
-        ),
+        style: TextStyle(color: Colors.orangeAccent,fontWeight: FontWeight.bold),
       );
     }
 
     if (dias <= 10) {
       return Text(
         "⚠ Vence em $dias dias",
-        style: const TextStyle(
-          color: Colors.yellowAccent,
-          fontWeight: FontWeight.bold,
-        ),
+        style: const TextStyle(color: Colors.yellowAccent,fontWeight: FontWeight.bold),
       );
     }
 
     return Text(
       "⏳ Vence em ${formatarData(doc.dataVencimento!)}",
-      style: const TextStyle(
-        color: Colors.orangeAccent,
-      ),
+      style: const TextStyle(color: Colors.orangeAccent),
     );
   }
 
@@ -198,79 +206,19 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
     return docs;
   }
 
-  int contarAlertas(List<Documento> docs) {
+  List<Documento> filtrarDocumentos(List<Documento> docs) {
 
-    int total = 0;
+    if (textoBusca.isEmpty) return docs;
 
-    for (var doc in docs) {
+    return docs.where((doc) {
 
-      final dias = diasParaVencer(doc);
+      final nome = doc.nome.toLowerCase();
+      final descricao = (doc.descricao ?? "").toLowerCase();
+      final busca = textoBusca.toLowerCase();
 
-      if (dias != null && dias <= 10) {
-        total++;
-      }
-
-    }
-
-    return total;
-  }
-
-  void mostrarAlertas(List<Documento> docs) {
-
-    final alertas = docs.where((doc) {
-
-      final dias = diasParaVencer(doc);
-      return dias != null && dias <= 10;
+      return nome.contains(busca) || descricao.contains(busca);
 
     }).toList();
-
-    showDialog(
-      context: context,
-      builder: (context) {
-
-        return AlertDialog(
-
-          title: const Text("Alertas de documentos"),
-
-          content: SizedBox(
-            width: 300,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: alertas.length,
-              itemBuilder: (context, index) {
-
-                final doc = alertas[index];
-                final dias = diasParaVencer(doc);
-
-                String texto;
-
-                if (dias! < 0) {
-                  texto = "VENCIDO";
-                } else if (dias == 0) {
-                  texto = "VENCE HOJE";
-                } else {
-                  texto = "Vence em $dias dias";
-                }
-
-                return ListTile(
-                  title: Text(doc.nome),
-                  subtitle: Text(texto),
-                );
-              },
-            ),
-          ),
-
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Fechar"),
-            )
-          ],
-
-        );
-
-      },
-    );
   }
 
   Future<void> abrirTelaAdicionar() async {
@@ -301,7 +249,7 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
     final url =
         "http://127.0.0.1:8080/documentos/visualizar/${doc.caminhoArquivo}";
 
-    if (ehImagem(doc.tipoArquivo)) {
+    if (ehImagem(doc)) {
 
       return ClipRRect(
         borderRadius: BorderRadius.circular(8),
@@ -310,16 +258,28 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
           width: 60,
           height: 60,
           fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return const Icon(Icons.image, size: 40, color: Colors.white70);
+          },
         ),
       );
 
-    } else {
+    } else if (ehPdf(doc)) {
 
       return const Icon(
         Icons.picture_as_pdf,
         size: 40,
         color: Colors.redAccent,
       );
+
+    } else {
+
+      return const Icon(
+        Icons.insert_drive_file,
+        size: 40,
+        color: Colors.white70,
+      );
+
     }
   }
 
@@ -330,63 +290,10 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
       backgroundColor: Colors.transparent,
 
       appBar: AppBar(
-        title: const Text(
-          "Meus Documentos",
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text("Meus Documentos"),
         backgroundColor: const Color(0xFF0B0F1A),
-        elevation: 0,
         actions: [
-
-          FutureBuilder<List<Documento>>(
-            future: documentosFuture,
-            builder: (context, snapshot) {
-
-              if (!snapshot.hasData) {
-                return const SizedBox();
-              }
-
-              final docs = snapshot.data!;
-              final alertas = contarAlertas(docs);
-
-              return Stack(
-                children: [
-
-                  IconButton(
-                    icon: const Icon(Icons.notifications),
-                    onPressed: () => mostrarAlertas(docs),
-                  ),
-
-                  if (alertas > 0)
-                    Positioned(
-                      right: 6,
-                      top: 6,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          "$alertas",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                ],
-              );
-            },
-          ),
-
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: logout,
-          )
-
+          IconButton(icon: const Icon(Icons.logout),onPressed: logout)
         ],
       ),
 
@@ -401,76 +308,102 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
               return const Center(child: CircularProgressIndicator());
             }
 
-            if (snapshot.hasError) {
-
+            if (!snapshot.hasData) {
               return const Center(
-                child: Text(
-                  "Erro ao carregar documentos",
-                  style: TextStyle(color: Colors.white),
-                ),
+                child: Text("Erro ao carregar documentos",
+                    style: TextStyle(color: Colors.white)),
               );
             }
 
-            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            var documentos = ordenarDocumentos(snapshot.data!);
+            documentos = filtrarDocumentos(documentos);
 
-              return const Center(
-                child: Text(
-                  "Nenhum documento cadastrado",
-                  style: TextStyle(color: Colors.white),
-                ),
-              );
-            }
+            return Column(
 
-            final documentos = ordenarDocumentos(snapshot.data!);
+              children: [
 
-            return ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: documentos.length,
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: TextField(
 
-              itemBuilder: (context, index) {
+                    controller: buscaController,
 
-                final doc = documentos[index];
+                    onChanged: (valor) {
+                      setState(() {
+                        textoBusca = valor;
+                      });
+                    },
 
-                return Card(
-                  color: corDoCard(doc),
-                  margin: const EdgeInsets.only(bottom: 12),
+                    style: const TextStyle(color: Colors.white),
 
-                  child: ListTile(
+                    decoration: InputDecoration(
 
-                    leading: construirPreview(doc),
+                      hintText: "Buscar documento...",
+                      hintStyle: const TextStyle(color: Colors.white54),
 
-                    title: Text(
-                      doc.nome,
-                      style: const TextStyle(color: Colors.white),
+                      prefixIcon: const Icon(Icons.search,color: Colors.white),
+
+                      filled: true,
+                      fillColor: const Color(0xFF1F2937),
+
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
-
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-
-                        Text(
-                          obterNomeCategoria(doc.categoria),
-                          style: const TextStyle(color: Colors.white70),
-                        ),
-
-                        const SizedBox(height: 4),
-
-                        Text(
-                          "📅 Enviado em ${formatarData(doc.dataUpload)}",
-                          style: const TextStyle(color: Colors.white54),
-                        ),
-
-                        if (doc.dataVencimento != null)
-                          alertaVencimento(doc),
-
-                      ],
-                    ),
-
-                    onTap: () => abrirDetalhes(doc),
-
                   ),
-                );
-              },
+                ),
+
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: documentos.length,
+
+                    itemBuilder: (context, index) {
+
+                      final doc = documentos[index];
+
+                      return Card(
+                        color: corDoCard(doc),
+                        margin: const EdgeInsets.only(bottom: 12),
+
+                        child: ListTile(
+
+                          leading: construirPreview(doc),
+
+                          title: Text(doc.nome,
+                              style: const TextStyle(color: Colors.white)),
+
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+
+                              Text(
+                                obterNomeCategoria(doc.categoria),
+                                style: const TextStyle(color: Colors.white70),
+                              ),
+
+                              const SizedBox(height: 4),
+
+                              Text(
+                                "📅 Enviado em ${formatarData(doc.dataUpload)}",
+                                style: const TextStyle(color: Colors.white54),
+                              ),
+
+                              if (doc.dataVencimento != null)
+                                alertaVencimento(doc),
+
+                            ],
+                          ),
+
+                          onTap: () => abrirDetalhes(doc),
+
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             );
           },
         ),

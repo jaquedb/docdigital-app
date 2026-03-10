@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../models/documento.dart';
 import '../widgets/app_background.dart';
 import '../services/token_storage.dart';
 import '../services/document_service.dart';
 import 'add_document_screen.dart';
+import 'pdf_viewer_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DocumentDetailScreen extends StatelessWidget {
 
@@ -24,32 +25,71 @@ class DocumentDetailScreen extends StatelessWidget {
         "${data.year}";
   }
 
-  bool ehImagem(String tipoArquivo) {
-    return tipoArquivo.contains("image");
+  bool ehImagem() {
+
+    final tipo = documento.tipoArquivo.toLowerCase();
+    final nome = documento.caminhoArquivo.toLowerCase();
+
+    return tipo.contains("image") ||
+        nome.endsWith(".png") ||
+        nome.endsWith(".jpg") ||
+        nome.endsWith(".jpeg");
   }
 
-  Future<void> visualizarDocumento() async {
+  bool ehPdf() {
 
-    final url = Uri.parse(
-      "http://127.0.0.1:8080/documentos/visualizar/${documento.caminhoArquivo}",
-    );
+    final tipo = documento.tipoArquivo.toLowerCase();
+    final nome = documento.caminhoArquivo.toLowerCase();
 
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
+    return tipo.contains("pdf") || nome.endsWith(".pdf");
+  }
+
+  void visualizarDocumento(BuildContext context) {
+
+    final url =
+        "http://127.0.0.1:8080/documentos/visualizar/${documento.caminhoArquivo}";
+
+    if (ehPdf()) {
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PdfViewerScreen(
+            url: url,
+            nomeDocumento: documento.nome,
+          ),
+        ),
+      );
+
+    } else if (ehImagem()) {
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => Scaffold(
+            backgroundColor: Colors.black,
+            appBar: AppBar(
+              backgroundColor: Colors.black,
+            ),
+            body: Center(
+              child: InteractiveViewer(
+                child: Image.network(url),
+              ),
+            ),
+          ),
+        ),
+      );
+
     }
-
   }
 
   Future<void> baixarDocumento() async {
 
-    final url = Uri.parse(
+    final uri = Uri.parse(
       "http://127.0.0.1:8080/documentos/download/${documento.caminhoArquivo}",
     );
 
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    }
-
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
   Future<void> editarDocumento(BuildContext context) async {
@@ -157,7 +197,7 @@ class DocumentDetailScreen extends StatelessWidget {
 
                 Center(
 
-                  child: ehImagem(documento.tipoArquivo)
+                  child: ehImagem()
 
                       ? ClipRRect(
                     borderRadius: BorderRadius.circular(12),
@@ -165,13 +205,28 @@ class DocumentDetailScreen extends StatelessWidget {
                       url,
                       height: 250,
                       fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(
+                          Icons.image,
+                          size: 120,
+                          color: Colors.white70,
+                        );
+                      },
                     ),
                   )
 
-                      : const Icon(
+                      : ehPdf()
+
+                      ? const Icon(
                     Icons.picture_as_pdf,
                     size: 120,
                     color: Colors.redAccent,
+                  )
+
+                      : const Icon(
+                    Icons.insert_drive_file,
+                    size: 120,
+                    color: Colors.white70,
                   ),
                 ),
 
@@ -215,7 +270,7 @@ class DocumentDetailScreen extends StatelessWidget {
                       child: ElevatedButton.icon(
                         icon: const Icon(Icons.visibility),
                         label: const Text("VISUALIZAR"),
-                        onPressed: visualizarDocumento,
+                        onPressed: () => visualizarDocumento(context),
                       ),
                     ),
 

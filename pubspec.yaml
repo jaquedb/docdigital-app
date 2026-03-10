@@ -23,6 +23,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
+  syncfusion_flutter_pdfviewer: ^32.2.8
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
