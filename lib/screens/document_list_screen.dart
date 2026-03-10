@@ -3,6 +3,7 @@ import '../widgets/app_background.dart';
 import '../services/document_service.dart';
 import '../services/token_storage.dart';
 import '../models/documento.dart';
+import '../config/api_config.dart';
 import 'add_document_screen.dart';
 import 'document_detail_screen.dart';
 
@@ -247,7 +248,7 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
   Widget construirPreview(Documento doc) {
 
     final url =
-        "http://127.0.0.1:8080/documentos/visualizar/${doc.caminhoArquivo}";
+        "${ApiConfig.baseUrl}/documentos/visualizar/${doc.caminhoArquivo}";
 
     if (ehImagem(doc)) {
 

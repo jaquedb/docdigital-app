@@ -3,10 +3,9 @@ import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import '../models/documento.dart';
 import 'token_storage.dart';
+import '../config/api_config.dart';
 
 class DocumentService {
-
-  static const String baseUrl = "http://127.0.0.1:8080";
 
   // LISTAR DOCUMENTOS
   static Future<List<Documento>> listarDocumentos() async {
@@ -18,7 +17,7 @@ class DocumentService {
     }
 
     final response = await http.get(
-      Uri.parse("$baseUrl/documentos"),
+      Uri.parse("${ApiConfig.baseUrl}/documentos"),
       headers: {
         "Authorization": "Bearer $token",
         "Content-Type": "application/json"
@@ -55,7 +54,7 @@ class DocumentService {
 
     var request = http.MultipartRequest(
       "POST",
-      Uri.parse("$baseUrl/documentos"),
+      Uri.parse("${ApiConfig.baseUrl}/documentos"),
     )..headers.addAll({
       "Authorization": "Bearer $token"
     });
@@ -119,7 +118,7 @@ class DocumentService {
     }
 
     final response = await http.put(
-      Uri.parse("$baseUrl/documentos/$id"),
+      Uri.parse("${ApiConfig.baseUrl}/documentos/$id"),
       headers: {
         "Authorization": "Bearer $token",
         "Content-Type": "application/json"
@@ -142,7 +141,7 @@ class DocumentService {
   static Future<void> deletarDocumento(int id, String token) async {
 
     final response = await http.delete(
-      Uri.parse("$baseUrl/documentos/$id"),
+      Uri.parse("${ApiConfig.baseUrl}/documentos/$id"),
       headers: {
         "Authorization": "Bearer $token",
         "Content-Type": "application/json"

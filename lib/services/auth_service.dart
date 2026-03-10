@@ -1,16 +1,15 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'token_storage.dart';
+import '../config/api_config.dart';
 
 class AuthService {
-
-  static const String baseUrl = "http://127.0.0.1:8080";
 
   // LOGIN
   static Future<void> login(String email, String senha) async {
 
     final response = await http.post(
-      Uri.parse("$baseUrl/auth/login"),
+      Uri.parse("${ApiConfig.baseUrl}/auth/login"),
       headers: {
         "Content-Type": "application/json"
       },
@@ -50,7 +49,7 @@ class AuthService {
   static Future<void> register(String nome, String email, String senha) async {
 
     final response = await http.post(
-      Uri.parse("$baseUrl/usuarios"),
+      Uri.parse("${ApiConfig.baseUrl}/usuarios"),
       headers: {
         "Content-Type": "application/json"
       },
@@ -71,7 +70,7 @@ class AuthService {
   static Future<Map<String, dynamic>> forgotPassword(String email) async {
 
     final response = await http.post(
-      Uri.parse("$baseUrl/auth/forgot-password?email=$email"),
+      Uri.parse("${ApiConfig.baseUrl}/auth/forgot-password?email=$email"),
     );
 
     if (response.statusCode == 200) {
@@ -90,7 +89,7 @@ class AuthService {
 
     final response = await http.post(
       Uri.parse(
-        "$baseUrl/auth/reset-password?email=$email&codigo=$codigo&novaSenha=$novaSenha",
+        "${ApiConfig.baseUrl}/auth/reset-password?email=$email&codigo=$codigo&novaSenha=$novaSenha",
       ),
     );
 

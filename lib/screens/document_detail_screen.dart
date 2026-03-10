@@ -3,6 +3,7 @@ import '../models/documento.dart';
 import '../widgets/app_background.dart';
 import '../services/token_storage.dart';
 import '../services/document_service.dart';
+import '../config/api_config.dart';
 import 'add_document_screen.dart';
 import 'pdf_viewer_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -47,7 +48,7 @@ class DocumentDetailScreen extends StatelessWidget {
   void visualizarDocumento(BuildContext context) {
 
     final url =
-        "http://127.0.0.1:8080/documentos/visualizar/${documento.caminhoArquivo}";
+        "${ApiConfig.baseUrl}/documentos/visualizar/${documento.caminhoArquivo}";
 
     if (ehPdf()) {
 
@@ -86,7 +87,7 @@ class DocumentDetailScreen extends StatelessWidget {
   Future<void> baixarDocumento() async {
 
     final uri = Uri.parse(
-      "http://127.0.0.1:8080/documentos/download/${documento.caminhoArquivo}",
+      "${ApiConfig.baseUrl}/documentos/download/${documento.caminhoArquivo}",
     );
 
     await launchUrl(uri, mode: LaunchMode.externalApplication);
@@ -164,7 +165,7 @@ class DocumentDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final url =
-        "http://127.0.0.1:8080/documentos/visualizar/${documento.caminhoArquivo}";
+        "${ApiConfig.baseUrl}/documentos/visualizar/${documento.caminhoArquivo}";
 
     return AppBackground(
 
