@@ -303,6 +303,28 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
                 ),
               ),
 
+              // BOTÃO REMOVER DATA
+              if (dataVencimento != null) ...[
+
+                const SizedBox(height: 10),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey[700],
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        dataVencimento = null;
+                      });
+                    },
+                    child: const Text("Remover data de vencimento"),
+                  ),
+                ),
+
+              ],
+
               const SizedBox(height: 40),
 
               SizedBox(
