@@ -251,6 +251,15 @@ class DocumentDetailScreen extends StatelessWidget {
 
                 const SizedBox(height: 10),
 
+                if (documento.descricao != null &&
+                    documento.descricao!.trim().isNotEmpty)
+                  Text(
+                    "Descrição: ${documento.descricao}",
+                    style: const TextStyle(color: Colors.white70),
+                  ),
+
+                const SizedBox(height: 10),
+
                 Text(
                   "Enviado em: ${formatarData(documento.dataUpload)}",
                   style: const TextStyle(color: Colors.white70),
