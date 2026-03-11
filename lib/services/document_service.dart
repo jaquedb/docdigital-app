@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import '../models/documento.dart';
@@ -115,6 +116,67 @@ class DocumentService {
     } else {
 
       throw Exception("Erro ao enviar documento: ${response.statusCode}");
+
+    }
+  }
+
+  // NOVO MÉTODO: UPLOAD MULTIPÁGINA
+  static Future<void> uploadDocumentoMultipage({
+    required List<String> imagens,
+    required String nome,
+    required String descricao,
+    required String categoria,
+    String? dataVencimento,
+  }) async {
+
+    final token = await TokenStorage.obterToken();
+
+    if (token == null) {
+      throw Exception("Usuário não autenticado");
+    }
+
+    var request = http.MultipartRequest(
+      "POST",
+      Uri.parse("${ApiConfig.baseUrl}/documentos/multipage"),
+    )..headers.addAll({
+      "Authorization": "Bearer $token"
+    });
+
+    for (String caminho in imagens) {
+
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          "files",
+          caminho,
+        ),
+      );
+
+    }
+
+    request.fields["nome"] = nome;
+    request.fields["descricao"] = descricao;
+    request.fields["categoria"] = categoria;
+
+    if (dataVencimento != null) {
+      request.fields["dataVencimento"] = dataVencimento;
+    }
+
+    final streamedResponse = await request.send();
+
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+
+      return;
+
+    } else if (response.statusCode == 401 || response.statusCode == 400) {
+
+      await TokenStorage.removerToken();
+      throw Exception("TOKEN_INVALIDO");
+
+    } else {
+
+      throw Exception("Erro ao enviar documento multipágina: ${response.statusCode}");
 
     }
   }

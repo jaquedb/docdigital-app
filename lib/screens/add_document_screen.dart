@@ -25,6 +25,8 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
 
   PlatformFile? arquivoSelecionado;
 
+  List<String> imagensDigitalizadas = [];
+
   final TextEditingController nomeController = TextEditingController();
   final TextEditingController descricaoController = TextEditingController();
 
@@ -94,8 +96,9 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
 
       if (imagens == null || imagens.isEmpty) return;
 
-      final File imagem = File(imagens.first);
+      imagensDigitalizadas = imagens;
 
+      final File imagem = File(imagens.first);
       final bytes = await imagem.readAsBytes();
 
       setState(() {
@@ -177,13 +180,28 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
 
       } else {
 
-        await DocumentService.uploadDocumento(
-          arquivo: arquivoSelecionado!,
-          nome: nomeController.text,
-          descricao: descricaoController.text,
-          categoria: categoriaBackend,
-          dataVencimento: dataFormatada,
-        );
+        if (imagensDigitalizadas.length > 1) {
+
+          await DocumentService.uploadDocumentoMultipage(
+            imagens: imagensDigitalizadas,
+            nome: nomeController.text,
+            descricao: descricaoController.text,
+            categoria: categoriaBackend,
+            dataVencimento: dataFormatada,
+          );
+
+        } else {
+
+          await DocumentService.uploadDocumento(
+            arquivo: arquivoSelecionado!,
+            nome: nomeController.text,
+            descricao: descricaoController.text,
+            categoria: categoriaBackend,
+            dataVencimento: dataFormatada,
+          );
+
+        }
+
       }
 
       try {
