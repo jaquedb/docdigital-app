@@ -6,6 +6,7 @@ import '../widgets/app_background.dart';
 import '../services/document_service.dart';
 import '../models/documento.dart';
 import '../services/notification_service.dart';
+import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 
 class AddDocumentScreen extends StatefulWidget {
 
@@ -87,22 +88,38 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
 
   Future<void> digitalizarDocumento() async {
 
-    final XFile? foto = await _picker.pickImage(
-      source: ImageSource.camera,
-      imageQuality: 85,
-    );
+    try {
 
-    if (foto == null) return;
+      List<String>? imagens = await CunningDocumentScanner.getPictures();
 
-    final bytes = await File(foto.path).readAsBytes();
+      if (imagens == null || imagens.isEmpty) return;
 
-    setState(() {
-      arquivoSelecionado = PlatformFile(
-        name: foto.name,
-        size: bytes.length,
-        bytes: bytes,
+      final File imagem = File(imagens.first);
+
+      final bytes = await imagem.readAsBytes();
+
+      setState(() {
+        arquivoSelecionado = PlatformFile(
+          name: "scan_${DateTime.now().millisecondsSinceEpoch}.jpg",
+          size: bytes.length,
+          bytes: bytes,
+        );
+      });
+
+    } catch (e) {
+
+      print("Erro ao digitalizar documento: $e");
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Erro ao abrir scanner"),
+        ),
       );
-    });
+
+    }
+
   }
 
   Future<void> selecionarData() async {
