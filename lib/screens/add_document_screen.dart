@@ -57,9 +57,12 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
       nomeController.text = doc.nome;
       descricaoController.text = doc.descricao ?? "";
 
-      categoriaSelecionada = categorias.entries
-          .firstWhere((e) => e.value == doc.categoria)
-          .key;
+      final categoriaEncontrada = categorias.entries.firstWhere(
+            (e) => e.value == doc.categoria,
+        orElse: () => const MapEntry("Documento pessoal", "DOCUMENTO_PESSOAL"),
+      );
+
+      categoriaSelecionada = categoriaEncontrada.key;
 
       if (doc.dataVencimento != null) {
         dataVencimento = DateTime.parse(doc.dataVencimento!);
@@ -166,7 +169,6 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
         );
       }
 
-      // 🔔 TESTE DE NOTIFICAÇÃO (5 segundos)
       try {
 
         await NotificationService.agendarNotificacao(
