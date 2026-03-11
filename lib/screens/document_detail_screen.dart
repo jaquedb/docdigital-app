@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import '../models/documento.dart';
 import '../widgets/app_background.dart';
-import '../services/token_storage.dart';
 import '../services/document_service.dart';
+import '../services/token_storage.dart';
 import '../config/api_config.dart';
 import 'add_document_screen.dart';
 import 'pdf_viewer_screen.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:media_scanner/media_scanner.dart';
 
 class DocumentDetailScreen extends StatelessWidget {
 
@@ -50,47 +52,55 @@ class DocumentDetailScreen extends StatelessWidget {
     final url =
         "${ApiConfig.baseUrl}/documentos/visualizar/${documento.caminhoArquivo}";
 
-    if (ehPdf()) {
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => PdfViewerScreen(
-            url: url,
-            nomeDocumento: documento.nome,
-          ),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => PdfViewerScreen(
+          url: url,
+          nomeDocumento: documento.nome,
         ),
-      );
-
-    } else if (ehImagem()) {
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => Scaffold(
-            backgroundColor: Colors.black,
-            appBar: AppBar(
-              backgroundColor: Colors.black,
-            ),
-            body: Center(
-              child: InteractiveViewer(
-                child: Image.network(url),
-              ),
-            ),
-          ),
-        ),
-      );
-
-    }
+      ),
+    );
   }
 
-  Future<void> baixarDocumento() async {
+  Future<void> baixarDocumento(BuildContext context) async {
 
-    final uri = Uri.parse(
-      "${ApiConfig.baseUrl}/documentos/download/${documento.caminhoArquivo}",
-    );
+    try {
 
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+      final bytes =
+      await DocumentService.baixarDocumento(documento.caminhoArquivo);
+
+      final directory = Directory("/storage/emulated/0/Download");
+
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+
+      final filePath = "${directory.path}/${documento.nome}.pdf";
+
+      final file = File(filePath);
+
+      await file.writeAsBytes(bytes);
+      await MediaScanner.loadMedia(path: file.path);
+
+      if (!context.mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Arquivo salvo em Download/${documento.nome}.pdf"),
+        ),
+      );
+
+    } catch (e) {
+
+      if (!context.mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Erro ao baixar arquivo"),
+        ),
+      );
+    }
   }
 
   Future<void> editarDocumento(BuildContext context) async {
@@ -197,37 +207,10 @@ class DocumentDetailScreen extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 Center(
-
-                  child: ehImagem()
-
-                      ? ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      url,
-                      height: 250,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(
-                          Icons.image,
-                          size: 120,
-                          color: Colors.white70,
-                        );
-                      },
-                    ),
-                  )
-
-                      : ehPdf()
-
-                      ? const Icon(
+                  child: const Icon(
                     Icons.picture_as_pdf,
                     size: 120,
                     color: Colors.redAccent,
-                  )
-
-                      : const Icon(
-                    Icons.insert_drive_file,
-                    size: 120,
-                    color: Colors.white70,
                   ),
                 ),
 
@@ -290,7 +273,7 @@ class DocumentDetailScreen extends StatelessWidget {
                       child: ElevatedButton.icon(
                         icon: const Icon(Icons.download),
                         label: const Text("BAIXAR"),
-                        onPressed: baixarDocumento,
+                        onPressed: () => baixarDocumento(context),
                       ),
                     ),
 

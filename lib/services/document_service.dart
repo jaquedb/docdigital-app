@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import '../models/documento.dart';
@@ -32,7 +33,6 @@ class DocumentService {
 
     } else if (response.statusCode == 401 || response.statusCode == 400) {
 
-      // TOKEN INVÁLIDO / USUÁRIO NÃO EXISTE
       await TokenStorage.removerToken();
       throw Exception("TOKEN_INVALIDO");
 
@@ -191,4 +191,32 @@ class DocumentService {
     }
   }
 
+  // NOVO MÉTODO: DOWNLOAD POR STREAM (MAIS RÁPIDO)
+  static Future<Uint8List> baixarDocumento(String caminhoArquivo) async {
+
+    final token = await TokenStorage.obterToken();
+
+    if (token == null) {
+      throw Exception("Usuário não autenticado");
+    }
+
+    final request = http.Request(
+      "GET",
+      Uri.parse("${ApiConfig.baseUrl}/documentos/download/$caminhoArquivo"),
+    );
+
+    request.headers.addAll({
+      "Authorization": "Bearer $token"
+    });
+
+    final streamedResponse = await request.send();
+
+    if (streamedResponse.statusCode != 200) {
+      throw Exception("Erro ao baixar documento");
+    }
+
+    final bytes = await streamedResponse.stream.toBytes();
+
+    return bytes;
+  }
 }
