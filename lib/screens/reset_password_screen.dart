@@ -19,8 +19,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   bool mostrarNovaSenha = false;
   bool mostrarConfirmarSenha = false;
+  bool carregando = false;
 
   Future<void> redefinirSenha() async {
+
+    if (carregando) return;
 
     String codigo = codigoController.text;
     String novaSenha = novaSenhaController.text;
@@ -39,6 +42,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       );
       return;
     }
+
+    setState(() {
+      carregando = true;
+    });
 
     try {
 
@@ -77,6 +84,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         const SnackBar(content: Text("Erro ao redefinir senha")),
       );
 
+    } finally {
+
+      if (mounted) {
+        setState(() {
+          carregando = false;
+        });
+      }
+
     }
 
   }
@@ -104,7 +119,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           alignment: Alignment.center,
           children: [
 
-            /// BOTÃO DE VOLTAR
             Positioned(
               top: 40,
               left: 10,
@@ -160,6 +174,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
                         TextField(
                           controller: codigoController,
+                          keyboardType: TextInputType.number,
+                          maxLength: 6,
                           style: const TextStyle(color: Colors.white),
                           decoration: const InputDecoration(
                             labelText: "Código",
@@ -178,9 +194,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         TextField(
                           controller: novaSenhaController,
                           obscureText: !mostrarNovaSenha,
+                          keyboardType: TextInputType.number,
+                          maxLength: 6,
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
-                            labelText: "Nova senha (6 números)",
+                            labelText: "Nova senha",
+                            helperText: "A senha deve conter 6 números",
+                            helperStyle: const TextStyle(color: Colors.white54),
                             labelStyle: const TextStyle(color: Colors.white70),
                             enabledBorder: const OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.white30),
@@ -209,9 +229,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         TextField(
                           controller: confirmarSenhaController,
                           obscureText: !mostrarConfirmarSenha,
+                          keyboardType: TextInputType.number,
+                          maxLength: 6,
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
                             labelText: "Confirmar senha",
+                            helperText: "Digite novamente os 6 números",
+                            helperStyle: const TextStyle(color: Colors.white54),
                             labelStyle: const TextStyle(color: Colors.white70),
                             enabledBorder: const OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.white30),
@@ -241,11 +265,20 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: redefinirSenha,
+                            onPressed: carregando ? null : redefinirSenha,
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 16),
                             ),
-                            child: const Text("REDEFINIR SENHA"),
+                            child: carregando
+                                ? const SizedBox(
+                              height: 22,
+                              width: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                                : const Text("REDEFINIR SENHA"),
                           ),
                         ),
 

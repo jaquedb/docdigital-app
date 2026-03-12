@@ -48,10 +48,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     try {
 
-      // cria usuário
       await AuthService.register(nome, email, senha);
-
-      // login automático
       await AuthService.login(email, senha);
 
       if (!mounted) return;
@@ -160,10 +157,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     TextField(
                       controller: senhaController,
                       obscureText: !senhaVisivel,
+                      keyboardType: TextInputType.number,
+                      maxLength: 6,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         labelText: "Senha",
+                        helperText: "A senha deve conter 6 números",
                         labelStyle: const TextStyle(color: Colors.white70),
+                        helperStyle: const TextStyle(color: Colors.white54),
                         enabledBorder: const OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white30),
                         ),
@@ -189,10 +190,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     TextField(
                       controller: confirmarSenhaController,
                       obscureText: !confirmarSenhaVisivel,
+                      keyboardType: TextInputType.number,
+                      maxLength: 6,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         labelText: "Confirmar senha",
+                        helperText: "Digite novamente os 6 números",
                         labelStyle: const TextStyle(color: Colors.white70),
+                        helperStyle: const TextStyle(color: Colors.white54),
                         enabledBorder: const OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white30),
                         ),
