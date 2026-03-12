@@ -15,7 +15,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController senhaController = TextEditingController();
   final TextEditingController confirmarSenhaController = TextEditingController();
 
+  bool senhaVisivel = false;
+  bool confirmarSenhaVisivel = false;
+  bool carregando = false;
+
   Future<void> criarConta() async {
+
+    if (carregando) return;
 
     final nome = nomeController.text;
     final email = emailController.text;
@@ -36,6 +42,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    setState(() {
+      carregando = true;
+    });
+
     try {
 
       // cria usuário
@@ -53,6 +63,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Erro ao criar conta")),
       );
+
+    } finally {
+
+      if (mounted) {
+        setState(() {
+          carregando = false;
+        });
+      }
 
     }
 
@@ -141,16 +159,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     TextField(
                       controller: senhaController,
-                      obscureText: true,
+                      obscureText: !senhaVisivel,
                       style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: "Senha",
-                        labelStyle: TextStyle(color: Colors.white70),
-                        enabledBorder: OutlineInputBorder(
+                        labelStyle: const TextStyle(color: Colors.white70),
+                        enabledBorder: const OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white30),
                         ),
-                        focusedBorder: OutlineInputBorder(
+                        focusedBorder: const OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            senhaVisivel ? Icons.visibility : Icons.visibility_off,
+                            color: Colors.white70,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              senhaVisivel = !senhaVisivel;
+                            });
+                          },
                         ),
                       ),
                     ),
@@ -159,16 +188,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                     TextField(
                       controller: confirmarSenhaController,
-                      obscureText: true,
+                      obscureText: !confirmarSenhaVisivel,
                       style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: "Confirmar senha",
-                        labelStyle: TextStyle(color: Colors.white70),
-                        enabledBorder: OutlineInputBorder(
+                        labelStyle: const TextStyle(color: Colors.white70),
+                        enabledBorder: const OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white30),
                         ),
-                        focusedBorder: OutlineInputBorder(
+                        focusedBorder: const OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            confirmarSenhaVisivel ? Icons.visibility : Icons.visibility_off,
+                            color: Colors.white70,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              confirmarSenhaVisivel = !confirmarSenhaVisivel;
+                            });
+                          },
                         ),
                       ),
                     ),
@@ -178,11 +218,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: criarConta,
+                        onPressed: carregando ? null : criarConta,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        child: const Text("CRIAR CONTA"),
+                        child: carregando
+                            ? const SizedBox(
+                          height: 22,
+                          width: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                            : const Text("CRIAR CONTA"),
                       ),
                     ),
 
