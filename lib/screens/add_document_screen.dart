@@ -35,6 +35,8 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
 
   final ImagePicker _picker = ImagePicker();
 
+  bool carregando = false;
+
   final Map<String, String> categorias = {
     "Documento pessoal": "DOCUMENTO_PESSOAL",
     "Documento veicular": "DOCUMENTO_VEICULAR",
@@ -143,6 +145,8 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
 
   Future<void> salvarDocumento() async {
 
+    if (carregando) return;
+
     if (!modoEdicao && arquivoSelecionado == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Selecione ou digitalize um arquivo")),
@@ -156,6 +160,10 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
       );
       return;
     }
+
+    setState(() {
+      carregando = true;
+    });
 
     try {
 
@@ -238,6 +246,15 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Erro ao salvar documento")),
       );
+
+    } finally {
+
+      if (mounted) {
+        setState(() {
+          carregando = false;
+        });
+      }
+
     }
   }
 
@@ -411,8 +428,17 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: salvarDocumento,
-                  child: Text(
+                  onPressed: carregando ? null : salvarDocumento,
+                  child: carregando
+                      ? const SizedBox(
+                    height: 22,
+                    width: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                      : Text(
                     modoEdicao ? "ATUALIZAR" : "SALVAR",
                   ),
                 ),

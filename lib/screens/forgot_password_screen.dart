@@ -13,8 +13,11 @@ class ForgotPasswordScreen extends StatefulWidget {
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   final TextEditingController emailController = TextEditingController();
+  bool carregando = false;
 
   Future<void> enviarCodigo() async {
+
+    if (carregando) return;
 
     String email = emailController.text;
 
@@ -24,6 +27,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       );
       return;
     }
+
+    setState(() {
+      carregando = true;
+    });
 
     try {
 
@@ -46,7 +53,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 onPressed: () {
                   Navigator.pop(context);
 
-                  Navigator.push( context,MaterialPageRoute(builder:(context) => ResetPasswordScreen(email: email),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ResetPasswordScreen(email: email),
                     ),
                   );
                 },
@@ -62,6 +72,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Erro ao enviar código")),
       );
+
+    } finally {
+
+      if (mounted) {
+        setState(() {
+          carregando = false;
+        });
+      }
 
     }
   }
@@ -111,11 +129,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: enviarCodigo,
+                onPressed: carregando ? null : enviarCodigo,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: const Text("ENVIAR"),
+                child: carregando
+                    ? const SizedBox(
+                  height: 22,
+                  width: 22,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+                    : const Text("ENVIAR"),
               ),
             ),
 
