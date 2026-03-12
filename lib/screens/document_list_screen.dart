@@ -6,6 +6,7 @@ import '../models/documento.dart';
 import '../config/api_config.dart';
 import 'add_document_screen.dart';
 import 'document_detail_screen.dart';
+import '../utils/categoria_utils.dart';
 
 class DocumentListScreen extends StatefulWidget {
   const DocumentListScreen({super.key});
@@ -48,38 +49,6 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
     Navigator.pushReplacementNamed(context, '/login');
   }
 
-  String obterNomeCategoria(String categoria) {
-
-    switch (categoria) {
-
-      case "DOCUMENTO_PESSOAL":
-        return "Documento pessoal";
-
-      case "DOCUMENTO_VEICULAR":
-        return "Documento veicular";
-
-      case "DOCUMENTO_ACADEMICO":
-        return "Documento acadêmico";
-
-      case "COMPROVANTE_PAGAMENTO":
-        return "Comprovante de pagamento";
-
-      case "NOTA_FISCAL":
-        return "Nota fiscal";
-
-      case "CONTRATO":
-        return "Contrato";
-
-      case "EXAME_MEDICO":
-        return "Exame médico";
-
-      case "RECEITUARIO_MEDICO":
-        return "Receituário médico";
-
-      default:
-        return "Outros";
-    }
-  }
 
   String formatarData(String dataIso) {
 

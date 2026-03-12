@@ -9,6 +9,7 @@ import '../config/api_config.dart';
 import 'add_document_screen.dart';
 import 'pdf_viewer_screen.dart';
 import 'package:media_scanner/media_scanner.dart';
+import '../utils/categoria_utils.dart';
 
 class DocumentDetailScreen extends StatelessWidget {
 
@@ -228,7 +229,7 @@ class DocumentDetailScreen extends StatelessWidget {
                 const SizedBox(height: 10),
 
                 Text(
-                  "Categoria: ${documento.categoria}",
+                  "Categoria: ${obterNomeCategoria(documento.categoria)}",
                   style: const TextStyle(color: Colors.white70),
                 ),
 
