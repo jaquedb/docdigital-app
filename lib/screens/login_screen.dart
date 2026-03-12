@@ -14,6 +14,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController senhaController = TextEditingController();
 
   bool carregando = false;
+  bool senhaVisivel = false;
 
   Future<void> fazerLogin() async {
 
@@ -133,16 +134,31 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     TextField(
                       controller: senhaController,
-                      obscureText: true,
+                      obscureText: !senhaVisivel,
+                      keyboardType: TextInputType.number,
+                      maxLength: 6,
                       style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: "Senha",
-                        labelStyle: TextStyle(color: Colors.white70),
-                        enabledBorder: OutlineInputBorder(
+                        hintText: "A senha deve conter 6 números",
+                        hintStyle: const TextStyle(color: Colors.white54),
+                        labelStyle: const TextStyle(color: Colors.white70),
+                        enabledBorder: const OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white30),
                         ),
-                        focusedBorder: OutlineInputBorder(
+                        focusedBorder: const OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.white),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            senhaVisivel ? Icons.visibility : Icons.visibility_off,
+                            color: Colors.white70,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              senhaVisivel = !senhaVisivel;
+                            });
+                          },
                         ),
                       ),
                     ),
