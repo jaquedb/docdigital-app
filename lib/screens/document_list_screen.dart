@@ -17,7 +17,7 @@ class DocumentListScreen extends StatefulWidget {
 
 class _DocumentListScreenState extends State<DocumentListScreen> {
 
-  late Future<List<Documento>> documentosFuture;
+   Future<List<Documento>> documentosFuture = Future.value([]);
 
   final TextEditingController buscaController = TextEditingController();
 
