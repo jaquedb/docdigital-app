@@ -99,6 +99,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     Image.asset(
                       "assets/images/logo_docdigital.png",
                       height: 120,
+                      fit: BoxFit.contain,
+                      filterQuality: FilterQuality.high,
+                      isAntiAlias: true,
                     ),
 
                     const SizedBox(height: 30),
@@ -173,7 +176,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         child: const Text(
                           "Esqueceu a senha?",
-                          style: TextStyle(color: Colors.white70),
+                          style: TextStyle(
+                            color: Colors.white70,
+                            decoration: TextDecoration.underline,
+                            decorationColor: Colors.white70,
+                            decorationThickness: 1.6,
+                            decorationStyle: TextDecorationStyle.solid,
+                          ),
                         ),
                       ),
                     ),
@@ -219,8 +228,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             "Cadastre-se",
                             style: TextStyle(
                               color: Colors.white,
-                              decoration: TextDecoration.underline,
                               fontWeight: FontWeight.w500,
+                              decoration: TextDecoration.underline,
+                              decorationColor: Colors.white,
+                              decorationThickness: 1.6,
+                              decorationStyle: TextDecorationStyle.solid,
                             ),
                           ),
                         ),
