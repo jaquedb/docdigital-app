@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
-import '../widgets/app_layout.dart';
+import '../widgets/app_background.dart';
 import 'reset_password_screen.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -91,7 +91,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         title: const Text("Recuperar senha"),
         backgroundColor: const Color(0xFF0B0F1A),
       ),
-      body: AppLayout(
+      body: AppBackground(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
