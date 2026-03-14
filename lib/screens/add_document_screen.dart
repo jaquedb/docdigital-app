@@ -212,19 +212,24 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
 
       }
 
-      try {
+      // Verifica se vence hoje
+      if (dataVencimento != null) {
 
-        await NotificationService.agendarNotificacao(
-          id: DateTime.now().millisecondsSinceEpoch ~/ 1000,
-          titulo: "Teste DocDigital",
-          corpo: "Notificação funcionando!",
-          data: DateTime.now().add(const Duration(seconds: 5)),
-        );
+        final hoje = DateTime.now();
 
-      } catch (e) {
+        final hojeSemHora = DateTime(hoje.year, hoje.month, hoje.day);
 
-        print("Erro ao agendar notificação: $e");
+        final vencimentoSemHora =
+        DateTime(dataVencimento!.year, dataVencimento!.month, dataVencimento!.day);
 
+        if (vencimentoSemHora == hojeSemHora) {
+
+          await NotificationService.mostrarNotificacaoAgora(
+            titulo: "Documento vencendo hoje",
+            corpo: "O documento \"${nomeController.text}\" vence hoje.",
+          );
+
+        }
       }
 
       if (!mounted) return;
