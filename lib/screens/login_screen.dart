@@ -140,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         labelText: "Senha",
-                        hintText: "A senha deve conter 6 números",
+                        hintText: "(6 dígitos)",
                         hintStyle: const TextStyle(color: Colors.white54),
                         labelStyle: const TextStyle(color: Colors.white70),
                         enabledBorder: const OutlineInputBorder(

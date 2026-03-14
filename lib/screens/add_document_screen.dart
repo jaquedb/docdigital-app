@@ -225,8 +225,8 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
         if (vencimentoSemHora == hojeSemHora) {
 
           await NotificationService.mostrarNotificacaoAgora(
-            titulo: "Documento vencendo hoje",
-            corpo: "O documento \"${nomeController.text}\" vence hoje.",
+            titulo: "⚠️ Documento vencendo hoje!",
+            corpo: "📄 O documento \"${nomeController.text}\" vence hoje.",
           );
 
         }
@@ -331,6 +331,8 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
                 controller: nomeController,
                 style: const TextStyle(color: Colors.white),
                 decoration: const InputDecoration(
+                  hintText: "Ex.:CNH,CRLV, Exame de sangue, etc...",
+                  hintStyle: TextStyle(color: Colors.white54),
                   filled: true,
                   fillColor: Color(0xFF1F2937),
                   border: OutlineInputBorder(),
@@ -350,6 +352,8 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
                 controller: descricaoController,
                 style: const TextStyle(color: Colors.white),
                 decoration: const InputDecoration(
+                  hintText: "(Opcional)",
+                  hintStyle: TextStyle(color: Colors.white54),
                   filled: true,
                   fillColor: Color(0xFF1F2937),
                   border: OutlineInputBorder(),
