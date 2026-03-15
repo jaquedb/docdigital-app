@@ -18,7 +18,6 @@ O objetivo do projeto é facilitar o acesso e organização de documentos import
 |-----------|--------------------|----------|
 | ![](docs/dashboard.jpg) | ![](docs/lista.jpg) | ![](docs/detalhes.jpg) |
 
-> As imagens podem ser adicionadas na pasta docs/.
 
 ---
 
