@@ -69,8 +69,35 @@ https://github.com/jaquedb/docdigital-api.git
 # 🏗 Arquitetura do Projeto
 
 O projeto segue uma arquitetura modular baseada em camadas:
-
-lib/ ├── config │   └── api_config.dart │ ├── models │   └── documento.dart │ ├── screens │   ├── login_screen.dart │   ├── register_screen.dart │   ├── dashboard_screen.dart │   ├── document_list_screen.dart │   └── document_detail_screen.dart │ ├── services │   ├── auth_service.dart │   ├── document_service.dart │   ├── token_storage.dart │   └── notification_service.dart │ ├── utils │   └── categoria_utils.dart │ ├── widgets │   └── app_background.dart │ └── main.dart
+```
+lib/
+├── config
+│   └── api_config.dart
+│
+├── models
+│   └── documento.dart
+│
+├── screens
+│   ├── login_screen.dart
+│   ├── register_screen.dart
+│   ├── dashboard_screen.dart
+│   ├── document_list_screen.dart
+│   └── document_detail_screen.dart
+│
+├── services
+│   ├── auth_service.dart
+│   ├── document_service.dart
+│   ├── token_storage.dart
+│   └── notification_service.dart
+│
+├── utils
+│   └── categoria_utils.dart
+│
+├── widgets
+│   └── app_background.dart
+│
+└── main.dart
+```
 
 ### Organização
 
