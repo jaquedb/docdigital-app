@@ -56,7 +56,7 @@ O objetivo do projeto é facilitar o acesso e organização de documentos import
 
 O aplicativo consome uma API desenvolvida em:
 
-- Java
+- Kotlin
 - Spring Boot
 - PostgreSQL
 - JWT Authentication
