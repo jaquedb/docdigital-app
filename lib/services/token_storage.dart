@@ -4,6 +4,7 @@ class TokenStorage {
 
   static const _storage = FlutterSecureStorage();
   static const _tokenKey = "auth_token";
+  static const _nomeKey = "auth_nome";
 
   static Future<void> salvarToken(String token) async {
     await _storage.write(key: _tokenKey, value: token);
@@ -18,8 +19,22 @@ class TokenStorage {
     return token;
   }
 
+  static Future<void> salvarNome(String nome) async {
+    await _storage.write(key: _nomeKey, value: nome);
+  }
+
+  static Future<String?> obterNome() async {
+
+    final nome = await _storage.read(key: _nomeKey);
+
+    print("NOME RECUPERADO: $nome");
+
+    return nome;
+  }
+
   static Future<void> removerToken() async {
     await _storage.delete(key: _tokenKey);
+    await _storage.delete(key: _nomeKey);
   }
 
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../widgets/app_background.dart';
 import '../services/document_service.dart';
 import '../services/token_storage.dart';
+import '../services/auth_service.dart';
 import '../models/documento.dart';
 import '../config/api_config.dart';
 import 'add_document_screen.dart';
@@ -17,11 +18,23 @@ class DocumentListScreen extends StatefulWidget {
 
 class _DocumentListScreenState extends State<DocumentListScreen> {
 
-   Future<List<Documento>> documentosFuture = Future.value([]);
+  Future<List<Documento>> documentosFuture = Future.value([]);
 
   final TextEditingController buscaController = TextEditingController();
 
   String textoBusca = "";
+
+  String saudacao() {
+    final hora = DateTime.now().hour;
+
+    if (hora < 12) {
+      return "☀ Bom dia";
+    } else if (hora < 18) {
+      return "⛅ Boa tarde";
+    } else {
+      return "🌛 Boa noite";
+    }
+  }
 
   @override
   void initState() {
@@ -291,6 +304,25 @@ class _DocumentListScreenState extends State<DocumentListScreen> {
             return Column(
 
               children: [
+
+                const SizedBox(height: 16),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "${saudacao()}, ${AuthService.nomeUsuario ?? "Usuário"}!",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
 
                 Padding(
                   padding: const EdgeInsets.all(16),

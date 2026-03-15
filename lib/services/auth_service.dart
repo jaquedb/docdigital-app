@@ -5,6 +5,8 @@ import '../config/api_config.dart';
 
 class AuthService {
 
+  static String? nomeUsuario;
+
   // LOGIN
   static Future<void> login(String email, String senha) async {
 
@@ -24,6 +26,7 @@ class AuthService {
       final data = jsonDecode(response.body);
 
       final token = data["token"];
+      final nome = data["nome"];
 
       if (token == null) {
         throw Exception("Token não recebido do backend");
@@ -33,6 +36,12 @@ class AuthService {
 
       // SALVA TOKEN
       await TokenStorage.salvarToken(token);
+
+      // SALVA NOME DO USUÁRIO
+      if (nome != null) {
+        nomeUsuario = nome;
+        await TokenStorage.salvarNome(nome);
+      }
 
       // CONFIRMA QUE FOI SALVO
       final tokenSalvo = await TokenStorage.obterToken();

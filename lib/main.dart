@@ -7,6 +7,7 @@ import 'screens/register_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'services/token_storage.dart';
 import 'services/notification_service.dart';
+import 'services/auth_service.dart';
 
 void main() async {
 
@@ -71,7 +72,19 @@ class _AuthCheckState extends State<AuthCheck> {
 
     print("TOKEN RECUPERADO: $token");
 
-    return token != null;
+    if (token != null) {
+
+      final nome = await TokenStorage.obterNome();
+
+      if (nome != null) {
+        AuthService.nomeUsuario = nome;
+        print("NOME RECUPERADO: $nome");
+      }
+
+      return true;
+    }
+
+    return false;
   }
 
   @override

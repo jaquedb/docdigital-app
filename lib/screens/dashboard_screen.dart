@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/app_background.dart';
 import '../services/document_service.dart';
+import '../services/auth_service.dart';
 import '../models/documento.dart';
 import 'document_list_screen.dart';
 import 'add_document_screen.dart';
@@ -20,6 +21,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     documentosFuture = DocumentService.listarDocumentos();
+  }
+
+  String saudacao() {
+    final hora = DateTime.now().hour;
+
+    if (hora < 12) {
+      return "☀ Bom dia";
+    } else if (hora < 18) {
+      return "⛅ Boa tarde";
+    } else {
+      return "🌛 Boa noite";
+    }
   }
 
   int? diasParaVencer(Documento doc) {
@@ -120,6 +133,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
 
                   children: [
+
+                    Text(
+                      "${saudacao()}, ${AuthService.nomeUsuario ?? "Usuário"}!",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
 
                     const Text(
                       "Resumo dos documentos",
