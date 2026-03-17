@@ -34,16 +34,13 @@ class AuthService {
 
       print("TOKEN RECEBIDO DO LOGIN: $token");
 
-      // SALVA TOKEN
       await TokenStorage.salvarToken(token);
 
-      // SALVA NOME DO USUÁRIO
       if (nome != null) {
         nomeUsuario = nome;
         await TokenStorage.salvarNome(nome);
       }
 
-      // CONFIRMA QUE FOI SALVO
       final tokenSalvo = await TokenStorage.obterToken();
       print("TOKEN SALVO NO STORAGE: $tokenSalvo");
 
@@ -93,6 +90,18 @@ class AuthService {
       throw Exception("Erro ao criar usuário: ${response.body}");
     }
 
+  }
+
+  // CONFIRMAR CADASTRO
+  static Future<void> confirmarCadastro(String email, String codigo) async {
+
+    final response = await http.post(
+      Uri.parse("${ApiConfig.baseUrl}/auth/confirmar-cadastro?email=$email&codigo=$codigo"),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Erro ao confirmar cadastro");
+    }
   }
 
   // RECUPERAR SENHA

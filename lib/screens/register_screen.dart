@@ -48,12 +48,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     try {
 
+      // CADASTRO
       await AuthService.register(nome, email, senha);
-      await AuthService.login(email, senha);
 
       if (!mounted) return;
 
-      Navigator.pushReplacementNamed(context, '/documentos');
+      //  FEEDBACK
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Código enviado para seu email"),
+        ),
+      );
+
+      //  REDIRECIONA PARA CONFIRMAÇÃO
+      Navigator.pushNamed(
+        context,
+        '/confirmar-cadastro',
+        arguments: {
+          "email": email,
+          "senha": senha,
+        }
+
+      );
 
     } catch (e) {
 

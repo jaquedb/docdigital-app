@@ -5,6 +5,7 @@ import 'screens/forgot_password_screen.dart';
 import 'screens/document_list_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/dashboard_screen.dart';
+import 'screens/confirmar_cadastro_screen.dart';
 import 'services/token_storage.dart';
 import 'services/notification_service.dart';
 import 'services/auth_service.dart';
@@ -52,6 +53,7 @@ class DocDigitalApp extends StatelessWidget {
         '/forgot-password': (context) => const ForgotPasswordScreen(),
         '/documentos': (context) => const DocumentListScreen(),
         '/dashboard': (context) => const DashboardScreen(),
+        '/confirmar-cadastro': (context) => const ConfirmarCadastroScreen(),
       },
     );
   }
