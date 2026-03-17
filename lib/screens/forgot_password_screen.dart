@@ -36,17 +36,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
       final response = await AuthService.forgotPassword(email);
 
-      final codigo = response["codigo"];
-
-      print("Código recebido: $codigo");
-
       showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text("Código para redefinição de senha"),
-            content: Text(
-              "Seu código de recuperação é:\n\n$codigo\n\nUse este código na próxima tela para redefinir sua senha.",
+            title: const Text("Recuperação de senha"),
+            content: const Text(
+              "Um código de recuperação foi enviado para o seu email.\n\nVerifique sua caixa de entrada.",
             ),
             actions: [
               TextButton(
@@ -66,7 +62,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           );
         },
       );
-
     } catch (e) {
 
       ScaffoldMessenger.of(context).showSnackBar(
