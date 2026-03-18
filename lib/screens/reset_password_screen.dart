@@ -43,6 +43,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       return;
     }
 
+    if (novaSenha.length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("A senha deve ter 6 números")),
+      );
+      return;
+    }
+
     setState(() {
       carregando = true;
     });

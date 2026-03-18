@@ -13,6 +13,35 @@ class _ConfirmarCadastroScreenState extends State<ConfirmarCadastroScreen> {
   final TextEditingController codigoController = TextEditingController();
 
   bool carregando = false;
+  bool jaEnviouAutomatico = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!jaEnviouAutomatico) {
+
+      final args = ModalRoute.of(context)!.settings.arguments as Map;
+
+      final email = args["email"] as String;
+      final reenviar = args["reenviar"] ?? false;
+
+      // 🔥 SÓ ENVIA AUTOMÁTICO SE VEIO DO LOGIN
+      if (reenviar == true) {
+        _reenviarCodigoAutomatico(email);
+      }
+
+      jaEnviouAutomatico = true;
+    }
+  }
+
+  Future<void> _reenviarCodigoAutomatico(String email) async {
+    try {
+      await AuthService.reenviarCodigo(email);
+    } catch (_) {
+      // não mostra erro automático (UX limpa)
+    }
+  }
 
   Future<void> confirmar(String email, String senha) async {
 

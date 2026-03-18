@@ -35,6 +35,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    if (senha.length != 6){
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("A senha deve conter exatamente 6 numeros")),
+    );
+      return;
+    }
+
     if (senha != confirmarSenha) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("As senhas não coincidem")),

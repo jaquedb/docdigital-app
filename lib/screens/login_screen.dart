@@ -50,11 +50,54 @@ class _LoginScreenState extends State<LoginScreen> {
         mensagem = mensagem.replaceFirst("Exception: ", "");
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(mensagem),
-        ),
-      );
+      // 🔥 TRATAMENTO INTELIGENTE
+      if (mensagem.contains("Email não verificado")) {
+
+        if (!mounted) return;
+
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("Confirmação necessária"),
+            content: const Text(
+                "Seu email ainda não foi verificado. Deseja confirmar agora?"
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("Cancelar"),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+
+                  Navigator.pushNamed(
+                    context,
+                    '/confirmar-cadastro',
+                    arguments: {
+                      "email": email,
+                      "senha": senha,
+                      "reenviar": true, // 🔥 ESSA LINHA É A CHAVE
+                    },
+                  );
+                },
+                child: const Text("Confirmar"),
+              ),
+            ],
+          ),
+        );
+
+      } else {
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(mensagem),
+          ),
+        );
+
+      }
 
     } finally {
 
@@ -179,9 +222,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: TextStyle(
                             color: Colors.white70,
                             decoration: TextDecoration.underline,
-                            decorationColor: Colors.white70,
-                            decorationThickness: 1.6,
-                            decorationStyle: TextDecorationStyle.solid,
                           ),
                         ),
                       ),
@@ -230,9 +270,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Colors.white,
                               fontWeight: FontWeight.w500,
                               decoration: TextDecoration.underline,
-                              decorationColor: Colors.white,
-                              decorationThickness: 1.6,
-                              decorationStyle: TextDecorationStyle.solid,
                             ),
                           ),
                         ),

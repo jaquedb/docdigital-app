@@ -32,17 +32,12 @@ class AuthService {
         throw Exception("Token não recebido do backend");
       }
 
-      print("TOKEN RECEBIDO DO LOGIN: $token");
-
       await TokenStorage.salvarToken(token);
 
       if (nome != null) {
         nomeUsuario = nome;
         await TokenStorage.salvarNome(nome);
       }
-
-      final tokenSalvo = await TokenStorage.obterToken();
-      print("TOKEN SALVO NO STORAGE: $tokenSalvo");
 
     } else {
 
@@ -60,9 +55,18 @@ class AuthService {
           throw Exception("Senha incorreta");
         }
 
+        if (mensagem.contains("Email não verificado")) {
+          throw Exception("Email não verificado. Verifique seu email.");
+        }
+
         throw Exception(mensagem);
 
       } catch (e) {
+
+        // 🔥 CORREÇÃO AQUI
+        if (e is Exception) {
+          rethrow; // NÃO ENGOLHE MAIS O ERRO
+        }
 
         throw Exception("Não foi possível realizar o login");
 
@@ -90,6 +94,18 @@ class AuthService {
       throw Exception("Erro ao criar usuário: ${response.body}");
     }
 
+  }
+
+  // REENVIAR CÓDIGO
+  static Future<void> reenviarCodigo(String email) async {
+
+    final response = await http.post(
+      Uri.parse("${ApiConfig.baseUrl}/auth/reenviar-codigo?email=$email"),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Erro ao reenviar código");
+    }
   }
 
   // CONFIRMAR CADASTRO
