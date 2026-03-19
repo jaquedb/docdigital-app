@@ -26,7 +26,6 @@ class _ConfirmarCadastroScreenState extends State<ConfirmarCadastroScreen> {
       final email = args["email"] as String;
       final reenviar = args["reenviar"] ?? false;
 
-      // 🔥 SÓ ENVIA AUTOMÁTICO SE VEIO DO LOGIN
       if (reenviar == true) {
         _reenviarCodigoAutomatico(email);
       }

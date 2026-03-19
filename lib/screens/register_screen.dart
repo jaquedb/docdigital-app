@@ -60,7 +60,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (!mounted) return;
 
-      //  FEEDBACK
+      //  FEEDBACk
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Código enviado para seu email"),

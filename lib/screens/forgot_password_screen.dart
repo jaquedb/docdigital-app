@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
-import '../widgets/app_background.dart';
+import '../widgets/auth_background.dart';
 import 'reset_password_screen.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -81,68 +81,71 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Recuperar senha"),
-        backgroundColor: const Color(0xFF0B0F1A),
-      ),
-      body: AppBackground(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+    return AuthBackground(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
 
-            const SizedBox(height: 40),
-
-            const Text(
-              "Digite seu email para receber o código de recuperação",
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 16,
-              ),
-              textAlign: TextAlign.center,
+          const Text(
+            "Recuperar senha",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.w500,
             ),
+          ),
 
-            const SizedBox(height: 30),
+          const SizedBox(height: 20),
 
-            TextField(
-              controller: emailController,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
-                labelText: "Email",
-                labelStyle: TextStyle(color: Colors.white70),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white30),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.white),
-                ),
-              ),
+          const Text(
+            "Digite seu email para receber o código de recuperação",
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 16,
             ),
+            textAlign: TextAlign.center,
+          ),
 
-            const SizedBox(height: 30),
+          const SizedBox(height: 30),
 
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: carregando ? null : enviarCodigo,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: carregando
-                    ? const SizedBox(
-                  height: 22,
-                  width: 22,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.white,
-                  ),
-                )
-                    : const Text("ENVIAR"),
+          TextField(
+            controller: emailController,
+            style: const TextStyle(color: Colors.white),
+            decoration: const InputDecoration(
+              labelText: "Email",
+              labelStyle: TextStyle(color: Colors.white70),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white30),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.white),
               ),
             ),
+          ),
 
-          ],
-        ),
+          const SizedBox(height: 30),
+
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: carregando ? null : enviarCodigo,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: carregando
+                  ? const SizedBox(
+                height: 22,
+                width: 22,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+                  : const Text("ENVIAR"),
+            ),
+          ),
+
+        ],
       ),
     );
   }
