@@ -63,9 +63,8 @@ class AuthService {
 
       } catch (e) {
 
-        // 🔥 CORREÇÃO AQUI
         if (e is Exception) {
-          rethrow; // NÃO ENGOLHE MAIS O ERRO
+          rethrow;
         }
 
         throw Exception("Não foi possível realizar o login");
@@ -150,8 +149,18 @@ class AuthService {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
+
+      final body = response.body;
+
+      if (body.isNotEmpty) {
+        final data = jsonDecode(body);
+
+        String mensagem = data["message"] ?? "Erro ao redefinir senha";
+
+        throw Exception(mensagem);
+      }
+
       throw Exception("Erro ao redefinir senha");
     }
   }
-
 }

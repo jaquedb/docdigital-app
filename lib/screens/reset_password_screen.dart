@@ -85,9 +85,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       );
 
     } catch (e) {
+      String mensagem =e.toString();
+
+      if (mensagem.startsWith("Exception: ")){
+        mensagem = mensagem.replaceFirst("Exception: ", "");
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Erro ao redefinir senha")),
+         SnackBar(content: Text(mensagem)),
       );
 
     } finally {
@@ -133,6 +138,16 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   fontSize: 16,
                 ),
                 textAlign: TextAlign.center,
+              ),
+
+              const SizedBox (height: 8),
+
+              const Text(
+                "O código expira em 10 minutos",
+                style: TextStyle(
+                  color: Colors.white54,
+                  fontSize: 12,
+                ),
               ),
 
               const SizedBox(height: 40),

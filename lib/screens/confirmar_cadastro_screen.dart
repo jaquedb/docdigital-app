@@ -38,7 +38,6 @@ class _ConfirmarCadastroScreenState extends State<ConfirmarCadastroScreen> {
     try {
       await AuthService.reenviarCodigo(email);
     } catch (_) {
-      // não mostra erro automático (UX limpa)
     }
   }
 
@@ -148,6 +147,16 @@ class _ConfirmarCadastroScreenState extends State<ConfirmarCadastroScreen> {
                       "Digite o código enviado para seu email",
                       style: TextStyle(color: Colors.white70),
                       textAlign: TextAlign.center,
+                    ),
+
+                    const SizedBox (height: 8),
+
+                    const Text(
+                      "O código expira em 10 minutos",
+                      style: TextStyle(
+                        color: Colors.white54,
+                        fontSize: 12,
+                      ),
                     ),
 
                     const SizedBox(height: 10),
