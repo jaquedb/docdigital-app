@@ -9,10 +9,14 @@ import 'screens/confirmar_cadastro_screen.dart';
 import 'services/token_storage.dart';
 import 'services/notification_service.dart';
 import 'services/auth_service.dart';
+import 'package:firebase_core/firebase_core.dart';
+
 
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp();
 
   await NotificationService.inicializar();
 

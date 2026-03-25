@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "440777589495",
+    "project_id": "docdigital-35dbd",
+    "storage_bucket": "docdigital-35dbd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:440777589495:android:39a2ac3ef3403686a989f2",
+        "android_client_info": {
+          "package_name": "com.example.docdigital_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjLnGKt1GUmeFtQw2GfGisS8p1c5hX_YQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

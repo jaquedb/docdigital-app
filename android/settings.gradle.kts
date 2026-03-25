@@ -1,4 +1,11 @@
 pluginManagement {
+
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+
     val flutterSdkPath =
         run {
             val properties = java.util.Properties()
@@ -10,11 +17,6 @@ pluginManagement {
 
     includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
 
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
-    }
 }
 
 plugins {

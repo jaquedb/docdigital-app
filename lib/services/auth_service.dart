@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'token_storage.dart';
 import '../config/api_config.dart';
+import 'fcm_service.dart';
 
 class AuthService {
 
@@ -27,6 +28,7 @@ class AuthService {
 
       final token = data["token"];
       final nome = data["nome"];
+      final id = data["id"];
 
       if (token == null) {
         throw Exception("Token não recebido do backend");
@@ -37,6 +39,14 @@ class AuthService {
       if (nome != null) {
         nomeUsuario = nome;
         await TokenStorage.salvarNome(nome);
+      }
+
+      if (id != null){
+        await TokenStorage.salvarUsuarioId(id.toString());
+      }
+
+      if (id != null) {
+        await FcmService.enviarTokenParaBackend(int.parse(id.toString()));
       }
 
     } else {
