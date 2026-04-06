@@ -213,7 +213,7 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
       }
 
       // Verifica se vence hoje
-      if (dataVencimento != null) {
+      /*if (dataVencimento != null) {
 
         final hoje = DateTime.now();
 
@@ -230,7 +230,7 @@ class _AddDocumentScreenState extends State<AddDocumentScreen> {
           );
 
         }
-      }
+      }*/
 
       if (!mounted) return;
 
