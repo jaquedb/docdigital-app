@@ -18,7 +18,8 @@ void main() async {
 
   await Firebase.initializeApp();
 
-  await NotificationService.inicializar();
+  //Fazer commit sem o código abaixo pra ver se dá bom
+  //await NotificationService.inicializar();
 
   runApp(const DocDigitalApp());
 }

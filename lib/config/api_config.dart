@@ -1,6 +1,6 @@
 class ApiConfig {
 
-  static const String baseUrl = "http://192.168.1.225:8080";
+  static const String baseUrl = "http://10.123.167.209:8080";
 
 }
-// 192.168.1.225
+// celular: 10.123.167.209
