@@ -64,7 +64,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     try {
 
       // CADASTRO
-      await AuthService.register(nome, email, senha);
+      await AuthService.register(
+          nome,
+          email,
+          senha,
+          aceitouPrivacidade,
+      );
 
       if (!mounted) return;
 

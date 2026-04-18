@@ -85,7 +85,12 @@ class AuthService {
   }
 
   // REGISTRO DE USUÁRIO
-  static Future<void> register(String nome, String email, String senha) async {
+  static Future<void> register(
+      String nome,
+      String email,
+      String senha,
+      bool aceitouPrivacidade,
+      ) async {
 
     final response = await http.post(
       Uri.parse("${ApiConfig.baseUrl}/usuarios"),
@@ -95,7 +100,8 @@ class AuthService {
       body: jsonEncode({
         "nome": nome,
         "email": email,
-        "senha": senha
+        "senha": senha,
+        "aceitouPrivacidade": aceitouPrivacidade
       }),
     );
 
