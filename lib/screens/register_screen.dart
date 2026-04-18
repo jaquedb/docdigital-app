@@ -18,6 +18,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool senhaVisivel = false;
   bool confirmarSenhaVisivel = false;
   bool carregando = false;
+  bool aceitouPrivacidade = false;
 
   Future<void> criarConta() async {
 
@@ -45,6 +46,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (senha != confirmarSenha) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("As senhas não coincidem")),
+      );
+      return;
+    }
+
+    if (!aceitouPrivacidade) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Você precisa aceitar a política de privacidade")),
       );
       return;
     }
@@ -239,6 +247,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
                         ),
                       ),
+                    ),
+
+                    CheckboxListTile(
+                      value: aceitouPrivacidade,
+                      onChanged: (value) {
+                        setState(() {
+                          aceitouPrivacidade = value ?? false;
+                        });
+                      },
+                      title: const Text(
+                        "Aceito a política de privacidade",
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      controlAffinity: ListTileControlAffinity.leading,
+                      activeColor: Colors.green,
                     ),
 
                     const SizedBox(height: 30),
