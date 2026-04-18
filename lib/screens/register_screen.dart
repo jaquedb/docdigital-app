@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import 'privacy_policy_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -261,9 +262,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           aceitouPrivacidade = value ?? false;
                         });
                       },
-                      title: const Text(
-                        "Aceito a política de privacidade",
-                        style: TextStyle(color: Colors.white70),
+                      title: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const PrivacyPolicyScreen(),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          "Aceito a política de privacidade",
+                          style: TextStyle(
+                            color: Colors.blueAccent,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
                       ),
                       controlAffinity: ListTileControlAffinity.leading,
                       activeColor: Colors.green,
